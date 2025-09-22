@@ -8,6 +8,7 @@
 
 #include "ES_Lib.h"
 
+int frequency = 16000000; // 16 MHz frequency = sys clock freq
 void enable_GPIOK()
 {
 	uint32_t pin2 = (1<<2);
