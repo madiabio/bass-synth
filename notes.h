@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define CHROMATIC_LEN 25   // number of notes defined (might change)
+
 typedef struct {
     const char *name;
     uint32_t step;
@@ -18,6 +20,7 @@ extern const int pentatonic_offsets[5];
 extern const int blues_offsets[6];
 
 // helper to build a scale in code
+// might need to extend notes to deal with bounds idk. come back to this (like B3 might cause OOB for chromatic[])
 void build_scale(uint8_t root_index,
                  const int *offsets,
                  int len,

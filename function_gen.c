@@ -4,28 +4,58 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "ES_Lib.h"
+#include "function_gen.h"
+#include "config.h"
+#include "waveforms.h"
+#include "notes.h"
 
-extern int frequency;
+volatile waveform_t waveform_mode = WAVE_SAW;  // default to saw
+volatile uint32_t phase_acc = 0; // holds current phase of the waveform
+volatile uint32_t phase_step = 0; // controls how much phase_acc advances each sample (determines output frequency)
 
-void timer0a_init(uint32_t fs_hz) {
-    SYSCTL->RCGCTIMER |= (1<<0);        // enable timer 0
-		while((SYSCTL->PRTIMER & (1 << 0)) == 0); // Wait until ready
+void timer0a_init() {
+    SYSCTL->RCGCTIMER |= (1<<0); // enable timer 0 clock
+		while((SYSCTL->PRTIMER & (1 << 0)) == 0) {}// Wait until ready
 
-    TIMER0->CTL &= ~(1<<0);      						// disable during setup
-    TIMER0->CFG = 0;                     		// 32-bit timer
-    uint32_t reload = (80000000/fs_hz) - 1;
+    TIMER0->CTL &= ~(1<<0); // disable during setup
+    TIMER0->CFG = 0; // 32-bit timer
     
-		TIMER0->TAMR = 0x2; 										// periodic down counter mode
-    TIMER0-TAILR = reload;              		// load value
-    TIMER0_IMR_R = TIMER_IMR_TATOIM;      	// enable timeout interrupt
-    NVIC_EN0_R |= (1U<<19);               	// enable IRQ 19
-    TIMER0_CTL_R |= TIMER_CTL_TAEN;       	// enable timer
+		TIMER0->TAMR = 0x2; // periodic down counter mode
+    TIMER0->TAILR = TIMER0A_RELOAD; // load value (defined in config.h)
+    TIMER0->IMR = 1; // enable timeout interrupt
+    
+		// enable IRQ 19 to enable interrupts on NVIC for TIMER0 (see NVIC Register Descriptions in datasheet and TIMER0 Handler in regref/course notes)
+		NVIC->IPR[19] = PRIORITY_TIMER0A; // set priority as defined in config header
+		NVIC->ISER[0] |= (1<<19); // this is the same thing as NVIC_ENn in the data sheet
+		TIMER0->CTL = 1;       	// enable timer
 }
 
 
+// Timer0A Handler function as defined in header file
+// Calculates the next value of the waveform
 void Timer0A_Handler(void) {
-    TIMER0_ICR_R = TIMER_ICR_TATOCINT;    // clear flag
+    TIMER0->ICR = (1<<0); // clear flag (set 1 to TATOCINT)
     phase_acc += phase_step;              // advance phase
     uint16_t sample = phase_acc >> 20;    // top 12 bits = 0..4095 sawtooth
     dac_write12(sample);                  // send to DAC
+
+    switch (waveform_mode) {
+        case WAVE_SINE: {
+            uint16_t idx = phase_acc >> 24;
+            sample = sine_table[idx];
+            break;
+        }
+        case WAVE_SAW:
+            sample = phase_acc >> 20;
+            break;
+        case WAVE_TRI: {
+            uint16_t saw = phase_acc >> 20;
+            sample = (saw < 2048) ? (saw * 2) : ((4095 - saw) * 2);
+            break;
+        }
+        case WAVE_SQUARE:
+            sample = (phase_acc & 0x80000000) ? 4095 : 0;
+            break;
+    }
+    dac_write12(sample);
 }
