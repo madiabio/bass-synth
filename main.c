@@ -10,7 +10,7 @@
 
 #include "function_gen.h" // for timer0a_init(), waveform_mode
 #include "input.h" // for handle_note_input()
-
+#include "waveforms.h" // for init_sine_table
 
 // ************* main function ***********************
 int main(void)
@@ -23,13 +23,15 @@ int main(void)
 	ES_printf("\n****************************************\n") ;
 
 	
+	init_sine_table(); // lookup table for sine wave
 	timer0a_init(); // init timer0a for the function generator
-	__enable_irq();
+	__enable_irq(); // enable interrupts on CPU lvl
 
-	while (1) {
+	while (true) {
 			// uint8_t key = get_keypad_input(); // your own keypad/uart function
 			handle_note_input(0, true); // hard coded for testing
 	}
-	while(true) {}
+	
+	
 	return 0;
 }

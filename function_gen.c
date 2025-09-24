@@ -37,25 +37,28 @@ void Timer0A_Handler(void) {
     TIMER0->ICR = (1<<0); // clear flag (set 1 to TATOCINT)
     phase_acc += phase_step;              // advance phase
     uint16_t sample = phase_acc >> 20;    // top 12 bits = 0..4095 sawtooth
-    dac_write12(sample);                  // send to DAC
+    // dac_write12(sample);                  // send to DAC
 
     switch (waveform_mode) {
-        case WAVE_SINE: {
-            uint16_t idx = phase_acc >> 24;
-            sample = sine_table[idx];
-            break;
-        }
-        case WAVE_SAW:
-            sample = phase_acc >> 20;
-            break;
-        case WAVE_TRI: {
-            uint16_t saw = phase_acc >> 20;
-            sample = (saw < 2048) ? (saw * 2) : ((4095 - saw) * 2);
-            break;
-        }
-        case WAVE_SQUARE:
-            sample = (phase_acc & 0x80000000) ? 4095 : 0;
-            break;
+			case WAVE_SINE: {
+				uint16_t idx = PHASE_TO_INDEX(phase_acc, TABLE_SIZE);  // e.g. 256 >> 24
+				sample = sine_table[idx]; // and then index the sine wave table with that, thats the sample.
+				break;
+			}
+			case WAVE_SAW:
+				sample = phase_acc >> 20; // this gives you between 0 and 4095, ideal for the 12 bit DAC.
+				break;
+			case WAVE_TRI: {
+				uint16_t saw = phase_acc >> 20;
+				sample = (saw < 2048) ? (saw * 2) : ((4095 - saw) * 2);
+				break;
+			}
+			case WAVE_SQUARE:
+				// 0x80000000 checks the MSB of the phase accumulator. 
+				// if MSB changes to 1, then we're halfway thru the phase, so change state.
+				sample = (phase_acc & 0x80000000) ? 4095 : 0;
+				break;
     }
-    dac_write12(sample);
+    
+		//dac_write12(sample);
 }
