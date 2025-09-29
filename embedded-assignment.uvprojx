@@ -134,11 +134,11 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>-1</DriverSelection>
+            <DriverSelection>4096</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -398,6 +398,51 @@
               <FileName>ES_Library.lib</FileName>
               <FileType>4</FileType>
               <FilePath>.\ES_Library.lib</FilePath>
+            </File>
+            <File>
+              <FileName>function_gen.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\function_gen.c</FilePath>
+            </File>
+            <File>
+              <FileName>notes.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\notes.c</FilePath>
+            </File>
+            <File>
+              <FileName>config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\config.h</FilePath>
+            </File>
+            <File>
+              <FileName>notes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\notes.h</FilePath>
+            </File>
+            <File>
+              <FileName>function_gen.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\function_gen.h</FilePath>
+            </File>
+            <File>
+              <FileName>waveforms.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\waveforms.h</FilePath>
+            </File>
+            <File>
+              <FileName>waveforms.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\waveforms.c</FilePath>
+            </File>
+            <File>
+              <FileName>input.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\input.c</FilePath>
+            </File>
+            <File>
+              <FileName>input.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\input.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -22,14 +22,19 @@ int main(void)
 
 	ES_printf("\n****************************************\n") ;
 
-	
 	init_sine_table(); // lookup table for sine wave
+	keypad_init(); // enable the GPIO pins required for the keypad
+	
+	init_PG1(); // for testing
 	timer0a_init(); // init timer0a for the function generator
 	__enable_irq(); // enable interrupts on CPU lvl
-
+	
+	
+	
 	while (true) {
 			// uint8_t key = get_keypad_input(); // your own keypad/uart function
 			handle_note_input(0, true); // hard coded for testing
+			scan_keypad();
 	}
 	
 	

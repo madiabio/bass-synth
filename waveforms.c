@@ -8,6 +8,7 @@
 
 uint16_t sine_table[TABLE_SIZE];
 
+
 void init_sine_table(void) {
     for (int i = 0; i < TABLE_SIZE; i++) {
         float angle = (2.0f * PI * i) / TABLE_SIZE;

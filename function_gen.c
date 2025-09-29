@@ -9,9 +9,20 @@
 #include "waveforms.h"
 #include "notes.h"
 
-volatile waveform_t waveform_mode = WAVE_SAW;  // default to saw
+volatile waveform_t waveform_mode = WAVE_SINE;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
 volatile uint32_t phase_step = 0; // controls how much phase_acc advances each sample (determines output frequency)
+
+// for testing
+void init_PG1()
+{
+	SYSCTL->RCGCGPIO |= (1<<6);
+	while ( (SYSCTL->PRGPIO & (1<<6)) == 0 ) {} // wait for stable
+	
+	GPIOG_AHB->DIR |= (1<<1); // enable 
+	GPIOG_AHB->DEN |= (1<<1); // enable DEN
+	GPIOG_AHB->DATA &= ~(1<<1); // clear data reg
+}
 
 void timer0a_init() {
     SYSCTL->RCGCTIMER |= (1<<0); // enable timer 0 clock
@@ -22,7 +33,7 @@ void timer0a_init() {
     
 		TIMER0->TAMR = 0x2; // periodic down counter mode
     TIMER0->TAILR = TIMER0A_RELOAD; // load value (defined in config.h)
-    TIMER0->IMR = 1; // enable timeout interrupt
+    TIMER0->IMR |= (1<<0); // enable timeout interrupt
     
 		// enable IRQ 19 to enable interrupts on NVIC for TIMER0 (see NVIC Register Descriptions in datasheet and TIMER0 Handler in regref/course notes)
 		NVIC->IPR[19] = PRIORITY_TIMER0A; // set priority as defined in config header
@@ -33,12 +44,14 @@ void timer0a_init() {
 
 // Timer0A Handler function as defined in header file
 // Calculates the next value of the waveform
-void Timer0A_Handler(void) {
+void TIMER0A_Handler(void) {
     TIMER0->ICR = (1<<0); // clear flag (set 1 to TATOCINT)
-    phase_acc += phase_step;              // advance phase
-    uint16_t sample = phase_acc >> 20;    // top 12 bits = 0..4095 sawtooth
-    // dac_write12(sample);                  // send to DAC
+		GPIOG_AHB->DATA ^= (1<<1);  // toggle PG1  
+		phase_acc += phase_step; // advance phase
+		uint16_t sample = 0;     // placeholder
 
+    // dac_write12(sample);                  // send to DAC
+		
     switch (waveform_mode) {
 			case WAVE_SINE: {
 				uint16_t idx = PHASE_TO_INDEX(phase_acc, TABLE_SIZE);  // e.g. 256 >> 24
@@ -59,6 +72,7 @@ void Timer0A_Handler(void) {
 				sample = (phase_acc & 0x80000000) ? 4095 : 0;
 				break;
     }
-    
+		
+
 		//dac_write12(sample);
 }
