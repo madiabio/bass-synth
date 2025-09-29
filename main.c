@@ -9,8 +9,9 @@
 #include "ES_Lib.h"
 
 #include "function_gen.h" // for timer0a_init(), waveform_mode
-#include "input.h" // for handle_note_input()
-#include "waveforms.h" // for init_sine_table
+#include "input.h" // for handle_note_input(), scan_keypad()
+#include "waveforms.h" // for init_sine_table()
+#include "i2c.h" // for init_i2c_0()
 
 // ************* main function ***********************
 int main(void)
@@ -25,9 +26,12 @@ int main(void)
 	init_sine_table(); // lookup table for sine wave
 	keypad_init(); // enable the GPIO pins required for the keypad
 	
+	init_i2c_0(); //
+	
 	init_PG1(); // for testing
 	timer0a_init(); // init timer0a for the function generator
 	__enable_irq(); // enable interrupts on CPU lvl
+	
 	
 	
 	

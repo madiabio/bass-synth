@@ -5,9 +5,10 @@
 #include <stdbool.h>
 #include "ES_Lib.h"
 #include "function_gen.h"
-#include "config.h"
-#include "waveforms.h"
-#include "notes.h"
+#include "config.h" 
+#include "waveforms.h" // for sine wave
+#include "notes.h" // for notes dict
+#include "i2c.h" // for mcp4275_write()
 
 volatile waveform_t waveform_mode = WAVE_SINE;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
@@ -49,11 +50,9 @@ void TIMER0A_Handler(void) {
 		GPIOG_AHB->DATA ^= (1<<1);  // toggle PG1  
 		phase_acc += phase_step; // advance phase
 		uint16_t sample = 0;     // placeholder
-
-    // dac_write12(sample);                  // send to DAC
 		
     switch (waveform_mode) {
-			case WAVE_SINE: {
+			case WAVE_SINE: { 
 				uint16_t idx = PHASE_TO_INDEX(phase_acc, TABLE_SIZE);  // e.g. 256 >> 24
 				sample = sine_table[idx]; // and then index the sine wave table with that, thats the sample.
 				break;
@@ -73,6 +72,5 @@ void TIMER0A_Handler(void) {
 				break;
     }
 		
-
-		//dac_write12(sample);
+		mcp4275_write(sample); // send sample to mcp4275
 }
