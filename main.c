@@ -28,11 +28,14 @@ int main(void)
 
 	
 	init_i2c_0(); //
-	//mcp4725_test_connection();
+	while(true)
+	{
+		mcp4725_test_connection();
+	}
 	// init_PG1(); // for testing
 	// timer0a_init(); // init timer0a for the function generator
 	
-	
+	/*
 	while(true)
 	{
 		// Write midscale value ~1.65V
@@ -41,7 +44,7 @@ int main(void)
 		mcp4725_write(0x0000);
 		msDelay(30);
 	}
-	
+	*/
 		
 	return 0;
 }

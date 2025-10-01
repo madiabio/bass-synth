@@ -17,12 +17,9 @@ void init_i2c_0(void)
 	GPIOB_AHB->PCTL |= (0x2 << (2*4)) | (0x2 << (3*4)); // Set to values from PCTL table for I2C0
 	
 	GPIOB_AHB->ODR |= PB3; // Enable open drain for SDA (PB3)
-	GPIOB_AHB->PUR |= PB2 | PB3; // Tempt est
-	
 		
 	SYSCTL->RCGCI2C |= (1<<0); // Enable clock for I2C0
 	while ( (SYSCTL->PRI2C & (1<<0)) == 0 ) {} // wait til stable
-	
 
 	I2C0->MCR = (1<<4); // Enable I2C as master
 	
