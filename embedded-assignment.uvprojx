@@ -464,6 +464,26 @@
               <FileType>5</FileType>
               <FilePath>.\adc.h</FilePath>
             </File>
+            <File>
+              <FileName>SSI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\SSI.c</FilePath>
+            </File>
+            <File>
+              <FileName>SSI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\SSI.h</FilePath>
+            </File>
+            <File>
+              <FileName>LCD_Display.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\LCD_Display.h</FilePath>
+            </File>
+            <File>
+              <FileName>LCD_Display.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>.\LCD_Display.lib</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

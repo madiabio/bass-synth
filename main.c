@@ -12,7 +12,8 @@
 #include "input.h" // for handle_note_input(), scan_keypad()
 #include "waveforms.h" // for init_sine_table()
 #include "i2c.h" // for init_i2c_0()
-
+#include "LCD_display.h"
+#include "SSI.h" // for initSPI(), init_SSI0()
 // ************* main function ***********************
 int main(void)
 {
@@ -26,21 +27,28 @@ int main(void)
 	//init_sine_table(); // lookup table for sine wave
 	// keypad_init(); // enable the GPIO pins required for the keypad
 
+	initSPI() ;	// These contain the SPI functions (See LCD_Display.h)
+	initLCD() ; // This function turns on and initialises the LCD
 	
-	init_i2c_0(); // for DAC
-	
-	while(true)
-	{
-		mcp4725_test_connection();
-	}
+	setRotation(2);
+    
+	clearScreen();
+	setCharConfig(ILI9341_DARKGREEN,1,1,ILI9341_BLACK,1);
+	drawString("Let's test the LCD",18);
+	setCharConfig(ILI9341_YELLOW,1,1,ILI9341_BLUE,1);
+	drawString("\r\nWelcome\r\nEveryone!",19);
 
-	init_PG1(); // for testing
+	drawRect(100,100,50,50,ILI9341_CYAN);
+
+	showDemo();
+	while(true) {}
+	// init_PG1(); // for testing
 	// timer0a_init(); // init timer0a for the function generator
 	
 	
-	dac_square_test();
+	// dac_square_test();
 	
 	
 		
-	return 0;
+	// return 0;
 }
