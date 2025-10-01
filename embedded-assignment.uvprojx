@@ -385,6 +385,11 @@
           <GroupName>Source Group 1</GroupName>
           <Files>
             <File>
+              <FileName>config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\config.h</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
@@ -400,19 +405,14 @@
               <FilePath>.\ES_Library.lib</FilePath>
             </File>
             <File>
+              <FileName>function_gen.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\function_gen.h</FilePath>
+            </File>
+            <File>
               <FileName>function_gen.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\function_gen.c</FilePath>
-            </File>
-            <File>
-              <FileName>notes.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\notes.c</FilePath>
-            </File>
-            <File>
-              <FileName>config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\config.h</FilePath>
             </File>
             <File>
               <FileName>notes.h</FileName>
@@ -420,9 +420,9 @@
               <FilePath>.\notes.h</FilePath>
             </File>
             <File>
-              <FileName>function_gen.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\function_gen.h</FilePath>
+              <FileName>notes.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\notes.c</FilePath>
             </File>
             <File>
               <FileName>waveforms.h</FileName>
@@ -435,14 +435,34 @@
               <FilePath>.\waveforms.c</FilePath>
             </File>
             <File>
+              <FileName>input.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\input.h</FilePath>
+            </File>
+            <File>
               <FileName>input.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\input.c</FilePath>
             </File>
             <File>
-              <FileName>input.h</FileName>
+              <FileName>i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>i2c.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\input.h</FilePath>
+              <FilePath>.\i2c.h</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\adc.h</FilePath>
             </File>
           </Files>
         </Group>

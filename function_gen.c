@@ -47,7 +47,7 @@ void timer0a_init() {
 // Calculates the next value of the waveform
 void TIMER0A_Handler(void) {
     TIMER0->ICR = (1<<0); // clear flag (set 1 to TATOCINT)
-		GPIOG_AHB->DATA ^= (1<<1);  // toggle PG1  
+		GPIOG_AHB->DATA ^= (1<<1);  // toggle PG1 (for testing)
 		phase_acc += phase_step; // advance phase
 		uint16_t sample = 0;     // placeholder
 		
@@ -72,5 +72,5 @@ void TIMER0A_Handler(void) {
 				break;
     }
 		
-		mcp4275_write(sample); // send sample to mcp4275
+		mcp4725_write(sample); // send sample to mcp4275
 }

@@ -22,25 +22,26 @@ int main(void)
 	ES_printf("\n Uart 0 : 19200 baud, 8bits, 1 stop bit \n") ;
 
 	ES_printf("\n****************************************\n") ;
+	__enable_irq(); // enable interrupts on CPU lvl
+	//init_sine_table(); // lookup table for sine wave
+	// keypad_init(); // enable the GPIO pins required for the keypad
 
-	init_sine_table(); // lookup table for sine wave
-	keypad_init(); // enable the GPIO pins required for the keypad
 	
 	init_i2c_0(); //
-	
-	init_PG1(); // for testing
-	timer0a_init(); // init timer0a for the function generator
-	__enable_irq(); // enable interrupts on CPU lvl
-	
+	//mcp4725_test_connection();
+	// init_PG1(); // for testing
+	// timer0a_init(); // init timer0a for the function generator
 	
 	
-	
-	while (true) {
-			// uint8_t key = get_keypad_input(); // your own keypad/uart function
-			handle_note_input(0, true); // hard coded for testing
-			scan_keypad();
+	while(true)
+	{
+		// Write midscale value ~1.65V
+    mcp4725_write(0x0FFF);
+		msDelay(30);
+		mcp4725_write(0x0000);
+		msDelay(30);
 	}
 	
-	
+		
 	return 0;
 }
