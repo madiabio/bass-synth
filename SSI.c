@@ -89,41 +89,6 @@ void spi_Transmit(uint8_t data) {
     while (SSI2->SR & (1<<4)) {}        // wait not busy
 }
 
-
-/*
-void init_SSI2() 
-{
-	SYSCTL->RCGCGPIO |= (1<<3); // enable GPIOD
-	while ( (SYSCTL->PRGPIO & (1<<3)) == 0 ) {} // wait
-
-	GPIOD_AHB->DIR |= (PD1 | PD2 | PD3); // enable Tx, Fss, Clk as output
-	GPIOA_AHB->DIR &= ~(PD0); // enable Rx as input
-	GPIOA_AHB->AFSEL |= (PD0 | PD1 | PD2 | PD3);
-	GPIOA_AHB->PCTL |= (0xF << 0*4) | (0xF << 1*4) | (0xF << 2*4) | (0xF << 3*4); // select PCTL vals
-	GPIOA_AHB->PUR |= PD3; // enable PUR for clock reg
-	
-	SYSCTL->RCGCSSI |= (1<<2);
-	while ( (SYSCTL->PRSSI & (1<<2)) == 0) {}
-	
-	// Disable SSI2 during config
-	SSI2->CR1 &= ~(1<<1);
-
-	// Master mode
-	SSI2->CR1 = 0;
-
-	// CPSR for baud rate (SysClk=16MHz ? 2 MHz SPI clock)
-	SSI2->CPSR = 8;
-
-	// CR0: SCR=0, SPO=1, SPH=1, FRF=0 (Freescale), DSS=8 bits
-	SSI2->CR0 = (0<<8) | (1<<7) | (1<<6) | (0<<4) | (0x7);
-
-	// Enable SSI2
-	SSI2->CR1 |= (1<<1);
-
-}
-*/
-
-
 void init_SSI3() // for I2S
 {
 	SYSCTL->RCGCGPIO |= (1 << 14);
