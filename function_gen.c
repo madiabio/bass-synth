@@ -10,7 +10,7 @@
 #include "notes.h" // for notes dict
 #include "i2c.h" // for mcp4275_write()
 
-volatile waveform_t waveform_mode = WAVE_SINE;  // default to saw
+volatile waveform_t waveform_mode = WAVE_SAW;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
 volatile uint32_t phase_step = 0; // controls how much phase_acc advances each sample (determines output frequency)
 

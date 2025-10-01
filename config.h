@@ -7,6 +7,7 @@
 #define SAMPLE_FREQ 12000u // slower sample rate to work with i2c
 // Derived timer reload value
 #define TIMER0A_RELOAD  ((SYS_CLK_FREQ / SAMPLE_FREQ) - 1)
+// #define TIMER0A_RELOAD 79999   // 1 kHz for testing
 
 // Priorities
 #define PRIORITY_TIMER0A 2 // Function generator interrupt priority

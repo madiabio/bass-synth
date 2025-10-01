@@ -13,11 +13,12 @@ void init_i2c_0(void)
 	// PB2 = I2C0SCL, PB3 = I2C0SDA
 	GPIOB_AHB->DEN |= PB2 | PB3;
 	GPIOB_AHB->AFSEL |= PB2 | PB3;
-	GPIOB_AHB->PCTL &= ~( (0xF << (2*4)) | (0xF << 3*4) ); // Clear PCTL bits for PB2 and PB3
+	GPIOB_AHB->PCTL &= ~( (0xF << (2*4)) | (0xF << (3*4)) ); // Clear PCTL bits for PB2 and PB3
 	GPIOB_AHB->PCTL |= (0x2 << (2*4)) | (0x2 << (3*4)); // Set to values from PCTL table for I2C0
 	
 	GPIOB_AHB->ODR |= PB3; // Enable open drain for SDA (PB3)
-		
+	
+	// GPIOB_AHB->ODR |= PB2; // Enable opend reain for SCL
 	SYSCTL->RCGCI2C |= (1<<0); // Enable clock for I2C0
 	while ( (SYSCTL->PRI2C & (1<<0)) == 0 ) {} // wait til stable
 
@@ -41,67 +42,47 @@ int i2c0_writeByte(uint8_t addr7, uint8_t data)
 		while (I2C0->MCS & (1<<0)) {} // wait til its not busy
 		
 		if (I2C0->MCS & I2C_MCS_ERROR) return -1; // error handling
-			
+		
+		I2C0->MCS &= ~(1<<5); // disable QCMD
 		return 0;
 }
 
-int i2c_writeBuffer(uint8_t addr7, const uint8_t *buf, uint8_t len)
-{
-	if (len <= 0) return -1; // invalid length
-	
-	while (I2C0->MCS & I2C_MCS_BUSY) {} // wait til not busy
+void mcp4725_write(uint16_t code) {
+    uint8_t upper = (code >> 8) & 0x0F;    // D11..D8
+    uint8_t byte2 = (upper & 0x0F);        // PD=00
+    uint8_t byte3 = code & 0xFF;           // D7..D0
 
-	I2C0->MSA = (addr7 <<1); // shift 7bit addr to right by 1 and set to write mode (0 in LSB)
-		
-	I2C0->MDR = buf[0]; // send initial byte of value to I2C bus
-	ES_printf("Sending: %02X %02X\n", buf[0], buf[1]);
+    I2C0->MSA = (MCP4725_ADDR<<1) | 0;   // write
 
-	I2C0->MCS = I2C_MCS_RUN | I2C_MCS_START; // MCS_RUN, MCS_START
-	if (I2C0->MCS & I2C_MCS_ERROR) {
-		if (I2C0->MCS & (1<<2)) ES_printf("ADDR NACK\n"); // Address not ack’d
-		if (I2C0->MCS & (1<<3)) ES_printf("DATA NACK\n"); // Data not ack’d
-		if (I2C0->MCS & (1<<4)) ES_printf("Arbitration lost\n");
-		return -1;
-	}
-	
-	while (I2C0->MCS & I2C_MCS_BUSY) {} // wait til not busy
+    I2C0->MDR = byte2;
+    I2C0->MCS = I2C_MCS_START | I2C_MCS_RUN;
+    while (I2C0->MCS & I2C_MCS_BUSY) {}
 
-	if (I2C0->MCS & I2C_MCS_ERROR) return -1; // Error handling
-	
-	for (uint8_t i=1; i<len; i++)
-	{
-		I2C0->MDR = buf[i]; // send byte to I2C bus
-		I2C0->MCS = (i == len-1) ? (I2C_MCS_RUN | I2C_MCS_STOP) : I2C_MCS_RUN; // If its not the last byte, clock out hte byte but keep bus active for more data. Else, clock out the byte and then generate STOP to release the bus.
-		while (I2C0->MCS & I2C_MCS_BUSY); // wait til stable
-		if (I2C0->MCS & I2C_MCS_ERROR)
-		{
-			ES_printf("I2C error\n");
-			return -1;
-		}			
-	}
-	
-	return 0; // worked correctly
-}
-
-void mcp4725_write(uint16_t value)
-{
-    uint8_t buf[2];
-    buf[0] = 0x40 | (value >> 8);    // control + D11..D8, extract the top 4 bits of 'value' (0x40 puts the DAC in fast write mode, which just writes to teh DAC and doesn't save anything to EEPROM)
-    buf[1] = (uint8_t)(value & 0xFF); // D7..D0, extract the lowest 8 bits of 'value' 
-    i2c_writeBuffer(MCP4725_ADDR, buf, 2);
+    I2C0->MDR = byte3;
+    I2C0->MCS = I2C_MCS_STOP | I2C_MCS_RUN;
+    while (I2C0->MCS & I2C_MCS_BUSY) {}
 }
 
 
 void mcp4725_test_connection()
 {
-	I2C0->MSA = (0x60 << 1) | 1; // R/W = 1 for read probe
-	I2C0->MCS = (1<<0) | (1<<1); // START + RUN
+	I2C0->MSA = (0x78 << 1) | 1; // R/W = 1 for read probe
+	I2C0->MCS = (1<<0) | (1<<1) | (1<<2); // START + RUN
 	while (I2C0->MCS & (1<<0)); // wait for BUSY to clear
-	if (I2C0->MCS & (1<<1)) {
+	if (I2C0->MCS & (1<<2)) {
 			ES_printf("NACK\n");
 	} else {
 			ES_printf("Ackd\n");
 	}
-	I2C0->MCS = (1<<2); // STOP
+	// I2C0->MCS = (1<<2); // STOP
+}
 
+void dac_square_test(){
+    const uint8_t addr = MCP4725_ADDR;                 // or 0x61 if A0=VDD
+    for(;;){
+        mcp4725_write(0);           // 0 V
+        msDelay(10);                        // 10 ms
+        mcp4725_write(4095);        // ~3.3 V
+        msDelay(10);                        // 10 ms  => ~50 Hz square
+    }
 }

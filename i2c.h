@@ -11,3 +11,4 @@ int i2c0_writeByte(uint8_t addr7, uint8_t data); // Writes a Byte to I2C with sl
 int i2c0_writeBuffer(uint8_t addr7, uint8_t* buf, uint8_t len); // General function to write a buffer of length len to I2C
 void mcp4725_write(uint16_t value); // write 12 bits to the MCP4275 DAC in fast write mode
 void mcp4725_test_connection(); // test the MCP4725 is connected
+void dac_square_test(); // tests DAC with a square wave
