@@ -11,23 +11,76 @@
 #include "i2c.h" // for mcp4275_write()
 #include "SSI.h" // for 
 #include "LCD_Display.h"
-volatile waveform_t waveform_mode = WAVE_SAW;  // default to saw
+#define DRAW_DECIMATE 64
+
+volatile uint16_t audio_buf[AUDIO_BUF_SIZE];
+volatile int buf_index = 0;
+
+volatile waveform_t waveform_mode = WAVE_SQUARE;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
 volatile uint32_t phase_step = 56229845; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
 volatile uint16_t current_sample = 0; // current global sample
 static int16_t x_pos = 0;
-int16_t scaleToY(uint16_t sample) {
-    return 239 - (sample * 239 / 4095); // scales the 12 bit sample to the size of the display.
+static int16_t prev_x = 0;
+static int16_t prev_y = ILI9341_TFTHEIGHT / 2; // start mid-screen
+
+
+#define WAVEFORM_CAPTURE_DOWNSAMPLE 64
+
+static volatile uint16_t waveform_buffers[2][WAVE_BUF_LEN];
+static volatile uint16_t waveform_write_index = 0;
+static volatile uint8_t waveform_write_buffer = 0;
+static volatile uint8_t waveform_ready_buffer = 0xFF;
+static volatile bool waveform_ready_flag = false;
+
+static inline void capture_waveform_sample(uint16_t sample)
+{
+    static uint16_t downsample_counter = 0;
+
+    if (++downsample_counter < WAVEFORM_CAPTURE_DOWNSAMPLE) {
+        return;
+    }
+
+    downsample_counter = 0;
+
+    waveform_buffers[waveform_write_buffer][waveform_write_index++] = sample;
+
+    if (waveform_write_index >= WAVE_BUF_LEN) {
+        waveform_ready_buffer = waveform_write_buffer;
+        waveform_write_buffer ^= 1;
+        waveform_write_index = 0;
+        waveform_ready_flag = true;
+    }
 }
 
-void draw(uint16_t sample) {
-    // LCD draw
-    int16_t y = scaleToY(sample);
-    drawPixel(x_pos, y, 0xFFFF);  // white
-    if (++x_pos >= 240) {
-        x_pos = 0;
-        fillScreen(0x0000);       // clear screen
+bool function_gen_waveform_ready(void)
+{
+    return waveform_ready_flag;
+}
+
+size_t function_gen_copy_waveform(uint16_t *dest, size_t max_samples)
+{
+    if ((dest == NULL) || (max_samples < WAVE_BUF_LEN)) {
+        return 0;
     }
+
+    size_t copied = 0;
+
+    __disable_irq();
+
+    if (waveform_ready_flag && waveform_ready_buffer <= 1) {
+        for (size_t i = 0; i < WAVE_BUF_LEN; ++i) {
+            dest[i] = waveform_buffers[waveform_ready_buffer][i];
+        }
+
+        waveform_ready_flag = false;
+        waveform_ready_buffer = 0xFF;
+        copied = WAVE_BUF_LEN;
+    }
+
+    __enable_irq();
+
+    return copied;
 }
 
 
@@ -67,7 +120,7 @@ void init_timer0a() {
 		// enable IRQ 19 to enable interrupts on NVIC for TIMER0 (see NVIC Register Descriptions in datasheet and TIMER0 Handler in regref/course notes)
 		NVIC->IPR[19] = PRIORITY_TIMER0A; // set priority as defined in config header
 		NVIC->ISER[0] |= (1<<19); // this is the same thing as NVIC_ENn in the data sheet
-		TIMER0->CTL = 1;       	// enable timer
+		// TIMER0->CTL = 1;       	// enable timer
 }
 
 uint16_t next_sample(void) {
@@ -92,45 +145,17 @@ uint16_t next_sample(void) {
             sample = (phase_acc & 0x80000000) ? 4095 : 0;
             break;
     }
+		
 		current_sample = sample; // update global copy
-    return sample << 4;   // align 12-bit to 16-bit (TEMP)
+    capture_waveform_sample(sample);
+
+    return sample;   // align 12-bit to 16-bit (TEMP)
 }
 
 
 // Timer0A Handler function as defined in header file
 // Calculates the next value of the waveform
 void TIMER0A_Handler(void) {
-    TIMER0->ICR = (1<<0); // clear flag (set 1 to TATOCINT)
-		GPIOG_AHB->DATA ^= PG1;  // toggle PG1 (for testing)
-		phase_acc += phase_step; // advance phase
-		uint16_t sample = 0;     // placeholder
-		
-    switch (waveform_mode) {
-			case WAVE_SINE: { 
-				uint16_t idx = PHASE_TO_INDEX(phase_acc, TABLE_SIZE);  // e.g. 256 >> 24
-				sample = sine_table[idx]; // and then index the sine wave table with that, thats the sample.
-				break;
-			}
-			case WAVE_SAW:
-				sample = phase_acc >> 20; // this gives you between 0 and 4095, ideal for the 12 bit DAC.
-				break;
-			case WAVE_TRI: {
-				uint16_t saw = phase_acc >> 20;
-				sample = (saw < 2048) ? (saw * 2) : ((4095 - saw) * 2);
-				break;
-			}
-			case WAVE_SQUARE:
-				// 0x80000000 checks the MSB of the phase accumulator. 
-				// if MSB changes to 1, then we're halfway thru the phase, so change state.
-				sample = (phase_acc & 0x80000000) ? 4095 : 0;
-				
-			break;
-    }
-		
-		
-		uint16_t out = sample << 4;   // 12-bit to 16-bit (TEMP)
-    GPIOQ->DATA &= ~PQ1;   // LRCLK low ? left
-		SSI3->DR = out;  // left channel
-		GPIOQ->DATA |= PQ1;   // LRCLK high ? right
-		SSI3->DR = out;  // right channel
+	TIMER0->ICR = 1; // clear flag
+	// draw();
 }

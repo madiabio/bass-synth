@@ -137,17 +137,15 @@ void init_SSI3() // for I2S
 }
 
 void SSI3_Handler(void) {
-	if (SSI3->MIS & TXMIS) // if TX FIFO half empty interrupt
-	{
-		// Fill it up until its full
-		while (SSI3->SR & TNF)
-		{
-			uint16_t out = next_sample();
-			draw(out);
-			SSI3->DR = out << 4; // L temp shifting by 4
-			SSI3->DR = out << 4; // R temp shifting by 4
-		}
-	}
-}
+    if (SSI3->MIS & TXMIS) {
+        while (SSI3->SR & TNF) {
+            uint16_t sample = next_sample();
+            SSI3->DR = sample << 4; // L
+            SSI3->DR = sample << 4; // R
 
+            audio_buf[buf_index++] = sample;
+            if (buf_index >= AUDIO_BUF_SIZE) buf_index = 0;
+        }
+    }
+}
 

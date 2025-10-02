@@ -1,9 +1,14 @@
 #ifndef FUNCTION_GEN_H
+
+#include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
+
 #define FUNCTION_GEN_H
 #define WAVE_BUF_LEN 240
 #define PG1 (1<<1)
 #define PK4 (1<<4)
-#include <stdint.h>
+#define AUDIO_BUF_SIZE 4800   // 0.1 sec at 48 kHz
 
 // Handles waveform mode
 typedef enum {
@@ -19,9 +24,15 @@ extern volatile uint32_t phase_acc;
 extern volatile uint32_t phase_step;
 extern volatile uint16_t current_sample;
 
+extern volatile uint16_t audio_buf[AUDIO_BUF_SIZE];
+extern volatile int buf_index;
 uint16_t next_sample(void);
 
-void draw(uint16_t sample);
+bool function_gen_waveform_ready(void);
+size_t function_gen_copy_waveform(uint16_t *dest, size_t max_samples);
+
+
+void draw();
 
 // Convert 32-bit phase accumulator to a table index
 // tbl_size must be a power of two (e.g. 256, 1024, 4096)

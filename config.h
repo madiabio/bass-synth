@@ -4,9 +4,11 @@
 // Core system definitions
 #define SYS_CLK_FREQ   250000000u   // system clock (Hz)
 #define SAMPLE_FREQ  48000u      // audio sample rate = 48kHz (Hz)
-// #define SAMPLE_FREQ 12000u // slower sample rate to work with i2c
+#define REFRESH_RATE 20 // 20Hz refresh raet for the screen
+
+
 // Derived timer reload value
-#define TIMER0A_RELOAD  ((SYS_CLK_FREQ / SAMPLE_FREQ) - 1)
+#define TIMER0A_RELOAD  ((SYS_CLK_FREQ / REFRESH_RATE) - 1)
 
 // Priorities
 #define PRIORITY_TIMER0A 2 // Function generator interrupt priority
