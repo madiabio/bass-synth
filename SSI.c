@@ -66,6 +66,8 @@ void initSPI(void) {
 
     GPIOD_AHB->PUR |= PD3; // pull-up on CLK if required
 
+		
+		GPIOD_AHB->AMSEL &= ~(PD0 | PD1 | PD2 | PD3);  // disable any analogue mode
     // Init SSI2
     SYSCTL->RCGCSSI |= (1<<2);
     while ((SYSCTL->PRSSI & (1<<2)) == 0) {}
@@ -75,12 +77,7 @@ void initSPI(void) {
     SSI2->CR0  = (5<<8) | SPH | SPO | 0x7; // set SCR to 29; sample on rising edge; idle clock high; 8-bit data len
 		// SSI2->CR1 |= (0x3 << 6); // mode 3 -> advanced SSI mode with 8-bit packet size
 
-		// Drain any stale receive data that might be left after a warm reset
-    while (SSI2->SR & RNE) {
-        (void)SSI2->DR;
-    }
-
-    GPIOD_AHB->DATA &= ~PD2; // Hold CS low permanently
+    GPIOD_AHB->DATA |= ~PD2; 
 		GPIOD_AHB->DATA |= PD0; // Put D/C High so LCD is in 'data' mode at reset.
 		
 		SSI2->CR1 |= SSE;  // Enable SSI2
@@ -89,15 +86,12 @@ void initSPI(void) {
 
 // for Dislpay
 void spi_Transmit(uint8_t data) {
-	if ((GPIOK->DATA & PK4) == 0)
-	{
-		GPIOK->DATA = PK4;  // toggle each call	
-	}
-	
-	while ((SSI2->SR & TNF) == 0) {} // wait until TX FIFO not full
-	SSI2->DR = data;
-	while (SSI2->SR & (1<<4)) {}        // wait not busy
+    while ((SSI2->SR & TNF) == 0) {}
+    SSI2->DR = data;
+    while (SSI2->SR & (1<<4)) {}
 }
+
+
 
 
 void init_SSI3() // for I2S
@@ -105,14 +99,15 @@ void init_SSI3() // for I2S
 	SYSCTL->RCGCGPIO |= (1 << 14);
 	while ( (SYSCTL->PRGPIO & (1<<14)) == 0) {}
 	
-	GPIOQ->DIR |= PQ3 | PQ1 | PQ0 | PQ2; // enable tx, fss, clk as output
-	// GPIOQ->DIR &= ~(PQ2); // enable rx as input
+	GPIOQ->DIR |= PQ3 | PQ1 | PQ0 ; // enable tx, fss, clk as output
+	GPIOQ->DIR &= ~(PQ2); // enable rx as input
 	GPIOQ->AFSEL |= PQ0 | PQ1 | PQ2 | PQ3; // enable all as alt functions
 	GPIOQ->PCTL |= (0xE << 0*4) | (0xE << 1*4) | (0xE << 2*4) | (0xE << 3*4); // Select SSI in PCTL
 	
 	GPIOQ->DEN |= PQ0 | PQ1 | PQ2 | PQ3; // enable all as digital
 	GPIOQ->PUR |= PQ0; // put PUR on clk
-	
+		
+
 	// Enable NVIC for SSI3 for interrupts	
 	NVIC->IPR[55] = PRIORITY_SSI3;
 	NVIC->ISER[1] |= (1 << (55-32)); // enable IRQ 55
