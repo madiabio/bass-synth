@@ -35,7 +35,7 @@ int main(void)
 
 	clearScreen();
 	setCharConfig(ILI9341_DARKGREEN,1,1,ILI9341_BLACK,1);
-	drawString("Let's test the LCD",18);
+	drawString("MADI TEST",18);
 	setCharConfig(ILI9341_YELLOW,1,1,ILI9341_BLUE,1);
 	drawString("\r\nWelcome\r\nEveryone!",19);
 

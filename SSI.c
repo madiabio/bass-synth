@@ -50,37 +50,27 @@ void init_SSI1() // for the 12 bit DAC
 }
 
 void initSPI(void) {
-		GPIOG_AHB->DATA |= PG1; // enable PG1 to show this has been called
-    // Enable Port D
-    SYSCTL->RCGCGPIO |= (1<<3);
-    while ((SYSCTL->PRGPIO & (1<<3)) == 0) {}
+	// Pins: PD0=D/C (GPIO), PD1=SSI2XDAT0, PD2=SSI2Fss, PD3=SSI2Clk
+	SYSCTL->RCGCGPIO |= (1<<3); while(!(SYSCTL->PRGPIO & (1<<3)));
 
-    // PD0=D/C (manual); PD1=SSI2XDAT0 (Tx); PD2= typically SSI2Fss; PD3=SSI2Clk; 
-    GPIOD_AHB->DIR  |= (PD0 | PD1 | PD2 | PD3);    // drive GPIO outputs before enabling alt
+	GPIOD_AHB->DIR  |= PD0;                   // D/C only
+	GPIOD_AHB->DEN  |= PD0|PD1|PD2|PD3;
+	GPIOD_AHB->AFSEL |= (PD1|PD2|PD3);        // HW MOSI, FSS, CLK
+	GPIOD_AHB->AFSEL &= ~PD0;
+	GPIOD_AHB->PCTL &= ~((0xF<<(0*4))|(0xF<<(1*4))|(0xF<<(2*4))|(0xF<<(3*4)));
+	GPIOD_AHB->PCTL |=  (0x0<<(0*4))|(0xF<<(1*4))|(0xF<<(2*4))|(0xF<<(3*4));
+	GPIOD_AHB->AMSEL &= ~(PD0|PD1|PD2|PD3);
 
-    GPIOD_AHB->DEN  |= (PD0 | PD1 | PD2 | PD3);
-    GPIOD_AHB->AFSEL |= (PD1 | PD3);    // SSI2Tx, SSI2Clk
-    GPIOD_AHB->AFSEL &= ~(PD0 | PD2);   // PD0=D/C, PD2=CS as GPIO
-    GPIOD_AHB->PCTL &= ~((0xF<<(1*4)) | (0xF<<(3*4)));
-    GPIOD_AHB->PCTL |=  (0xF<<(1*4)) | (0xF<<(3*4)); // SSI2 on PD1,PD3
+	SYSCTL->RCGCSSI |= (1<<2); while(!(SYSCTL->PRSSI & (1<<2)));
 
-    GPIOD_AHB->PUR |= PD3; // pull-up on CLK if required
+	SSI2->CR1 = 0;                // legacy, master
+	SSI2->ICR = 0x3;              // clear ROR/RT
+	SSI2->CPSR = 10;              // prescale
+	SSI2->CR0  = (5<<8) | (1<<7) | (1<<6) | 0x7; // SCR=5, SPO=1, SPH=1, 8-bit
+	SSI2->CR1 |= (1<<1);          // SSE enable
 
-		
-		GPIOD_AHB->AMSEL &= ~(PD0 | PD1 | PD2 | PD3);  // disable any analogue mode
-    // Init SSI2
-    SYSCTL->RCGCSSI |= (1<<2);
-    while ((SYSCTL->PRSSI & (1<<2)) == 0) {}
-
-    SSI2->CR1 &= ~SSE;                 // disable SSI2, master mode
-    SSI2->CPSR = 10;                // prescale: 120/60 = 2 MHz
-    SSI2->CR0  = (5<<8) | SPH | SPO | 0x7; // set SCR to 29; sample on rising edge; idle clock high; 8-bit data len
-		// SSI2->CR1 |= (0x3 << 6); // mode 3 -> advanced SSI mode with 8-bit packet size
-
-    GPIOD_AHB->DATA |= ~PD2; 
-		GPIOD_AHB->DATA |= PD0; // Put D/C High so LCD is in 'data' mode at reset.
-		
-		SSI2->CR1 |= SSE;  // Enable SSI2
+	// idle levels
+	GPIOD_AHB->DATA |= PD0;       // D/C=1 (data) until library toggles it
 }
 
 
