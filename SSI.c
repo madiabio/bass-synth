@@ -54,7 +54,7 @@ void initSPI(void) {
     while ((SYSCTL->PRGPIO & (1<<3)) == 0) {}
 
     // PD0=D/C (manual); PD1=SSI2XDAT0 (Tx); PD2= typically SSI2Fss; PD3=SSI2Clk; 
-    GPIOD_AHB->DIR  |= (PD0 | PD2 ); // enable both pins as an output
+    GPIOD_AHB->DIR  |= (PD0 | PD1 | PD2 | PD3);    // drive GPIO outputs before enabling alt
     GPIOD_AHB->DEN  |= (PD0 | PD1 | PD2 | PD3);
     GPIOD_AHB->AFSEL |= (PD1 | PD3);    // SSI2Tx, SSI2Clk
     GPIOD_AHB->AFSEL &= ~(PD0 | PD2);   // PD0=D/C, PD2=CS as GPIO
