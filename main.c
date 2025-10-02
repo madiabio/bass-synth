@@ -39,9 +39,10 @@ int main(void)
 	setCharConfig(ILI9341_YELLOW,1,1,ILI9341_BLUE,1);
 	drawString("\r\nWelcome\r\nEveryone!",19);
 
-	drawRect(100,100,50,50,ILI9341_CYAN);
+	
 
-	// init_SSI3(); // for I2S DAC
+	init_SSI3(); // for I2S DAC
+	drawRect(100,100,50,50,ILI9341_CYAN);
 	//init_timer0a(); // for function generator
 	while(true)
 	{
