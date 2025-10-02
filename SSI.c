@@ -10,6 +10,8 @@
 #define TNF (1<<1) // QSSI Transmit FIFO Not Full
 #define SPH (1<<7) // QSSI Serial Clock phase
 #define SPO (1<<6) // QSSI Serial Clock Polarity
+#define RNE (1<<2) // QSSI Receive FIFO Not Empty
+
 void init_SSI1() // for the 12 bit DAC
 {
 	
@@ -54,7 +56,8 @@ void initSPI(void) {
     while ((SYSCTL->PRGPIO & (1<<3)) == 0) {}
 
     // PD0=D/C (manual); PD1=SSI2XDAT0 (Tx); PD2= typically SSI2Fss; PD3=SSI2Clk; 
-    GPIOD_AHB->DIR  |= (PD0 | PD2 ); // enable both pins as an output
+    GPIOD_AHB->DIR  |= (PD0 | PD1 | PD2 | PD3);    // drive GPIO outputs before enabling alt
+
     GPIOD_AHB->DEN  |= (PD0 | PD1 | PD2 | PD3);
     GPIOD_AHB->AFSEL |= (PD1 | PD3);    // SSI2Tx, SSI2Clk
     GPIOD_AHB->AFSEL &= ~(PD0 | PD2);   // PD0=D/C, PD2=CS as GPIO
@@ -68,15 +71,21 @@ void initSPI(void) {
     while ((SYSCTL->PRSSI & (1<<2)) == 0) {}
 
     SSI2->CR1 &= ~SSE;                 // disable SSI2, master mode
-    SSI2->CPSR = 60;                // prescale: 120/60 = 2 MHz
-    SSI2->CR0  = (29<<8) | SPH | SPO | 0x7; // set SCR to 29; sample on rising edge; idle clock high; 8-bit data len
-		SSI2->CR1 |= (0x3 << 6); // mode 3 -> advanced SSI mode with 8-bit packet size
+    SSI2->CPSR = 10;                // prescale: 120/60 = 2 MHz
+    SSI2->CR0  = (5<<8) | SPH | SPO | 0x7; // set SCR to 29; sample on rising edge; idle clock high; 8-bit data len
+		// SSI2->CR1 |= (0x3 << 6); // mode 3 -> advanced SSI mode with 8-bit packet size
+
+		// Drain any stale receive data that might be left after a warm reset
+    while (SSI2->SR & RNE) {
+        (void)SSI2->DR;
+    }
 
     GPIOD_AHB->DATA &= ~PD2; // Hold CS low permanently
 		GPIOD_AHB->DATA |= PD0; // Put D/C High so LCD is in 'data' mode at reset.
 		
 		SSI2->CR1 |= SSE;  // Enable SSI2
 }
+
 
 // for Dislpay
 void spi_Transmit(uint8_t data) {
@@ -90,13 +99,14 @@ void spi_Transmit(uint8_t data) {
 	while (SSI2->SR & (1<<4)) {}        // wait not busy
 }
 
+
 void init_SSI3() // for I2S
 {
 	SYSCTL->RCGCGPIO |= (1 << 14);
 	while ( (SYSCTL->PRGPIO & (1<<14)) == 0) {}
 	
-	GPIOQ->DIR |= PQ3 | PQ1 | PQ0; // enable tx, fss, clk as output
-	GPIOQ->DIR &= ~(PQ2); // enable rx as input
+	GPIOQ->DIR |= PQ3 | PQ1 | PQ0 | PQ2; // enable tx, fss, clk as output
+	// GPIOQ->DIR &= ~(PQ2); // enable rx as input
 	GPIOQ->AFSEL |= PQ0 | PQ1 | PQ2 | PQ3; // enable all as alt functions
 	GPIOQ->PCTL |= (0xE << 0*4) | (0xE << 1*4) | (0xE << 2*4) | (0xE << 3*4); // Select SSI in PCTL
 	
