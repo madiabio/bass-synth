@@ -129,8 +129,8 @@ void init_SSI3() // for I2S
 	// Pre-fill the FIFO array
 	for (int i=0; i<8; i++) {
 			uint16_t out = next_sample();
-			SSI3->DR = out;
-			SSI3->DR = out;
+			SSI3->DR = out << 4; // temp shifting
+			SSI3->DR = out << 4; // temp shifting 
 	}
 
 	SSI3->CR1 |= (1<<1); // enable SSI3 again
@@ -143,8 +143,9 @@ void SSI3_Handler(void) {
 		while (SSI3->SR & TNF)
 		{
 			uint16_t out = next_sample();
-			SSI3->DR = out; // L
-			SSI3->DR = out; // R
+			draw(out);
+			SSI3->DR = out << 4; // L temp shifting by 4
+			SSI3->DR = out << 4; // R temp shifting by 4
 		}
 	}
 }

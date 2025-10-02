@@ -18,9 +18,10 @@ extern volatile waveform_t waveform_mode;
 extern volatile uint32_t phase_acc;
 extern volatile uint32_t phase_step;
 extern volatile uint16_t current_sample;
+
 uint16_t next_sample(void);
 
-
+void draw(uint16_t sample);
 
 // Convert 32-bit phase accumulator to a table index
 // tbl_size must be a power of two (e.g. 256, 1024, 4096)

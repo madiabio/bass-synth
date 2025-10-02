@@ -43,10 +43,9 @@ int main(void)
 
 	init_SSI3(); // for I2S DAC
 	drawRect(100,100,50,50,ILI9341_CYAN);
-	//init_timer0a(); // for function generator
 	while(true)
 	{
-		
+		clearScreen();
 	}
 	
 	// init_PG1(); // for testing

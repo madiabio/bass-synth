@@ -15,6 +15,20 @@ volatile waveform_t waveform_mode = WAVE_SAW;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
 volatile uint32_t phase_step = 56229845; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
 volatile uint16_t current_sample = 0; // current global sample
+static int16_t x_pos = 0;
+int16_t scaleToY(uint16_t sample) {
+    return 239 - (sample * 239 / 4095); // scales the 12 bit sample to the size of the display.
+}
+
+void draw(uint16_t sample) {
+    // LCD draw
+    int16_t y = scaleToY(sample);
+    drawPixel(x_pos, y, 0xFFFF);  // white
+    if (++x_pos >= 240) {
+        x_pos = 0;
+        fillScreen(0x0000);       // clear screen
+    }
+}
 
 
 // for testing
