@@ -9,10 +9,13 @@
 #include "waveforms.h" // for sine wave
 #include "notes.h" // for notes dict
 #include "i2c.h" // for mcp4275_write()
-
+#include "SSI.h" // for 
+#include "LCD_Display.h"
 volatile waveform_t waveform_mode = WAVE_SAW;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
-volatile uint32_t phase_step = 0; // controls how much phase_acc advances each sample (determines output frequency)
+volatile uint32_t phase_step = 56229845; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
+volatile uint16_t current_sample = 0; // current global sample
+
 
 // for testing
 void init_PG1()
@@ -20,12 +23,23 @@ void init_PG1()
 	SYSCTL->RCGCGPIO |= (1<<6);
 	while ( (SYSCTL->PRGPIO & (1<<6)) == 0 ) {} // wait for stable
 	
-	GPIOG_AHB->DIR |= (1<<1); // enable 
-	GPIOG_AHB->DEN |= (1<<1); // enable DEN
-	GPIOG_AHB->DATA &= ~(1<<1); // clear data reg
+	GPIOG_AHB->DIR |= PG1 ; // enable 
+	GPIOG_AHB->DEN |= PG1 ; // enable DEN
+	GPIOG_AHB->DATA &= ~PG1 ; // clear data reg
 }
 
-void timer0a_init() {
+// for testing
+void init_PK4()
+{
+	SYSCTL->RCGCGPIO |= (1<<9);
+	while ( (SYSCTL->PRGPIO & (1<<9)) == 0 ) {}
+	
+	GPIOK->DEN |= PK4;
+	GPIOK->DIR |= PK4;
+	GPIOK->DATA &= ~PK4;
+}
+
+void init_timer0a() {
     SYSCTL->RCGCTIMER |= (1<<0); // enable timer 0 clock
 		while((SYSCTL->PRTIMER & (1 << 0)) == 0) {}// Wait until ready
 
@@ -42,12 +56,38 @@ void timer0a_init() {
 		TIMER0->CTL = 1;       	// enable timer
 }
 
+uint16_t next_sample(void) {
+    phase_acc += phase_step;
+    uint16_t sample = 0;
+
+    switch (waveform_mode) {
+        case WAVE_SINE: {
+            uint16_t idx = PHASE_TO_INDEX(phase_acc, TABLE_SIZE);
+            sample = sine_table[idx];
+            break;
+        }
+        case WAVE_SAW:
+            sample = phase_acc >> 20;
+            break;
+        case WAVE_TRI: {
+            uint16_t saw = phase_acc >> 20;
+            sample = (saw < 2048) ? (saw * 2) : ((4095 - saw) * 2);
+            break;
+        }
+        case WAVE_SQUARE:
+            sample = (phase_acc & 0x80000000) ? 4095 : 0;
+            break;
+    }
+		current_sample = sample; // update global copy
+    return sample << 4;   // align 12-bit to 16-bit (TEMP)
+}
+
 
 // Timer0A Handler function as defined in header file
 // Calculates the next value of the waveform
 void TIMER0A_Handler(void) {
     TIMER0->ICR = (1<<0); // clear flag (set 1 to TATOCINT)
-		GPIOG_AHB->DATA ^= (1<<1);  // toggle PG1 (for testing)
+		GPIOG_AHB->DATA ^= PG1;  // toggle PG1 (for testing)
 		phase_acc += phase_step; // advance phase
 		uint16_t sample = 0;     // placeholder
 		
@@ -69,8 +109,14 @@ void TIMER0A_Handler(void) {
 				// 0x80000000 checks the MSB of the phase accumulator. 
 				// if MSB changes to 1, then we're halfway thru the phase, so change state.
 				sample = (phase_acc & 0x80000000) ? 4095 : 0;
-				break;
+				
+			break;
     }
 		
-		mcp4725_write(sample); // send sample to mcp4275
+		
+		uint16_t out = sample << 4;   // 12-bit to 16-bit (TEMP)
+    GPIOQ->DATA &= ~PQ1;   // LRCLK low ? left
+		SSI3->DR = out;  // left channel
+		GPIOQ->DATA |= PQ1;   // LRCLK high ? right
+		SSI3->DR = out;  // right channel
 }

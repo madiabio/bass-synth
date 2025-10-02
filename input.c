@@ -2,7 +2,7 @@
 #include "notes.h"
 #include "function_gen.h"
 #include "input.h"
-#include "ES_Lib.h"
+#include "ES.h"
 #include <TM4C129.h>
 #include <stdint.h>
 
@@ -67,10 +67,10 @@ void scan_keypad()
 			for (int row = 0; row < 4; row++) {
 				if ((rows >> row) & 0x1) {
 					char key = keyMap[row][col];
-					ES_printf("Key Pressed: %c\n", key);
+					ES_Uprintf(0, "Key Pressed: %c\n", key);
 				}	
 			}
 		}
-		msDelay(30);
+		ES_msDelay(30);
 	}
 }

@@ -1,24 +1,18 @@
 #include <TM4C129.h>
 #include "ES_Lib.h"
 #include <stdint.h>
-#define PB4 (1<<4) // SSI1Fss
-#define PB5 (1<<5) // SSI1Clk
-#define PE4	(1<<4) // SSI1XDAT0 (unused) Rx
-#define PE5 (1<<5) // SSI1XDAT1 Tx
-
-#define PQ0 (1<<0) // SSI3Clk
-#define PQ1 (1<<1) // SSI3Fss
-#define PQ2 (1<<2) // SSI3XDAT0 (unused) Rx
-#define PQ3 (1<<3) // SSI3XDAT1 Tx
-
-#define PD0 (1<<0) // SSI2XDAT1 Tx
-#define PD1 (1<<1) // SSI2XDAT0 (unused) Rx
-#define PD2 (1<<2) // SS2Fss
-#define PD3 (1<<3) // SSI2Clk
-
-
+#include "SSI.h"
+#include "config.h" // for priorities
+#include "function_gen.h" // for next_sample();
+#define TXIM (1<<3) // QSSI Transmit FIFO Interrupt Mask
+#define TXMIS (1<<3) // QSSI Transmit FIFO Masked Interrupt Status
+#define SSE (1<<1) // QSSI Synchronous Serial Port Enable
+#define TNF (1<<1) // QSSI Transmit FIFO Not Full
+#define SPH (1<<7) // QSSI Serial Clock phase
+#define SPO (1<<6) // QSSI Serial Clock Polarity
 void init_SSI1() // for the 12 bit DAC
 {
+	
 	SYSCTL->RCGCGPIO |= (1<<1) | (1<<4); // enable GPIOA
 	while ( (SYSCTL->PRGPIO & ((1<<1) | (1<<4))) == 0 ) {}
 	GPIOB_AHB->DIR |= PB4 | PB5;  // enable Tx, Fss, Clk be output
@@ -39,7 +33,7 @@ void init_SSI1() // for the 12 bit DAC
 	SYSCTL->RCGCSSI |= (1<<1); // enable SSI1
 	while ( (SYSCTL->PRSSI & (1<<1)) == 0) {} // wait til ready
 			
-	SSI1->CR1 &= ~(1<<1); // disable SSI1
+	SSI1->CR1 &= ~(SSE); // disable SSI1
 	
 	SSI1->CPSR = 2; 
 	
@@ -49,19 +43,18 @@ void init_SSI1() // for the 12 bit DAC
 						| (1 << 6)   // SPH=1 (mode 1)
 						| (0xF);     // 16-bit data
 	
-	SSI1->CR1 |= (1<<1); // Enable SSI1
+	SSI1->CR1 |= SSE; // Enable SSI1
 	
 }
 
-
-
 void initSPI(void) {
+		GPIOG_AHB->DATA |= PG1; // enable PG1 to show this has been called
     // Enable Port D
     SYSCTL->RCGCGPIO |= (1<<3);
     while ((SYSCTL->PRGPIO & (1<<3)) == 0) {}
 
-    // PD1=SSI2Tx, PD3=SSI2Clk, PD2=CS (manual), PD0=D/C (manual)
-    GPIOD_AHB->DIR  |= (PD0 | PD1 | PD2 | PD3);
+    // PD0=D/C (manual); PD1=SSI2XDAT0 (Tx); PD2= typically SSI2Fss; PD3=SSI2Clk; 
+    GPIOD_AHB->DIR  |= (PD0 | PD2 ); // enable both pins as an output
     GPIOD_AHB->DEN  |= (PD0 | PD1 | PD2 | PD3);
     GPIOD_AHB->AFSEL |= (PD1 | PD3);    // SSI2Tx, SSI2Clk
     GPIOD_AHB->AFSEL &= ~(PD0 | PD2);   // PD0=D/C, PD2=CS as GPIO
@@ -70,23 +63,31 @@ void initSPI(void) {
 
     GPIOD_AHB->PUR |= PD3; // pull-up on CLK if required
 
-    // Enable SSI2
+    // Init SSI2
     SYSCTL->RCGCSSI |= (1<<2);
     while ((SYSCTL->PRSSI & (1<<2)) == 0) {}
 
-    SSI2->CR1 = 0;                 // disable SSI2, master mode
-    SSI2->CPSR = 8;                // prescale: 16/8 = 2 MHz
-    SSI2->CR0  = (0<<8) | (1<<7) | (1<<6) | 0x7; // mode 3, 8-bit
-    SSI2->CR1 |= (1<<1);           // enable SSI2
+    SSI2->CR1 &= ~SSE;                 // disable SSI2, master mode
+    SSI2->CPSR = 60;                // prescale: 120/60 = 2 MHz
+    SSI2->CR0  = (29<<8) | SPH | SPO | 0x7; // set SCR to 29; sample on rising edge; idle clock high; 8-bit data len
+		SSI2->CR1 |= (0x3 << 6); // mode 3 -> advanced SSI mode with 8-bit packet size
 
-    // Hold CS low permanently
-    GPIOD_AHB->DATA &= ~PD2;
+    GPIOD_AHB->DATA &= ~PD2; // Hold CS low permanently
+		GPIOD_AHB->DATA |= PD0; // Put D/C High so LCD is in 'data' mode at reset.
+		
+		SSI2->CR1 |= SSE;  // Enable SSI2
 }
 
+// for Dislpay
 void spi_Transmit(uint8_t data) {
-    while ((SSI2->SR & (1<<1)) == 0) {} // wait TX FIFO not full
-    SSI2->DR = data;
-    while (SSI2->SR & (1<<4)) {}        // wait not busy
+	if ((GPIOK->DATA & PK4) == 0)
+	{
+		GPIOK->DATA = PK4;  // toggle each call	
+	}
+	
+	while ((SSI2->SR & TNF) == 0) {} // wait until TX FIFO not full
+	SSI2->DR = data;
+	while (SSI2->SR & (1<<4)) {}        // wait not busy
 }
 
 void init_SSI3() // for I2S
@@ -102,10 +103,55 @@ void init_SSI3() // for I2S
 	GPIOQ->DEN |= PQ0 | PQ1 | PQ2 | PQ3; // enable all as digital
 	GPIOQ->PUR |= PQ0; // put PUR on clk
 	
+	// Enable NVIC for SSI3 for interrupts	
+	NVIC->IPR[55] = PRIORITY_SSI3;
+	NVIC->ISER[1] |= (1 << (55-32)); // enable IRQ 55
+	
 	SYSCTL->RCGCSSI |= (1<<3); // enable SSI3 clock
 	while ( (SYSCTL->PRSSI & (1<<3)) == 0) {} // wait
 	
 	SSI3->CR1 &= ~(1<<1); // disable SSI3
-	SSI3->CPSR = 2; // fSSICLk = f_sysclk / (CPSDVSR * (1+SCR))
-	SSI3->CR0 = (4<<8) | (0x0 << 6) | (0xF); // SCR = 4, SPI/TI frame format , DSS = 16 bit data.
+	
+	// fSSI = f_sysclk / ( CPSDVSR * (1+SCR) ) = 1.536 MHz
+	// fSSI = 120 MHz / 10 = 1.6 MHz = 1.6 MHz (˜ 4% high)                                                                                 
+	SSI3->CPSR = 2; // fSSICLk = f_sysclk / (CPSDVSR * (1+SCR)); CPDVSR  = 48kHz*16; even prescalar
+	SSI3->CR0 = (38 << 8) // SCR (Serial Clock Rate) = 38
+                        // Together with CPSDVSR (from SSI3->CPSR), this divides the system clock:
+                        // fSSI = f_sysclk / (CPSDVSR * (1 + SCR))
+                        // This sets the bit clock frequency for I2S/SPI.
+
+            | (0x2 << 6) // SPO/SPH bits = 0b10
+                        // Bit 7 = SPH = 1 ? data shifted/captured on second edge (adds 1-bit delay)
+                        // Bit 6 = SPO = 0 ? clock idles low
+                        // This combination matches I2S requirement (WS changes one bit before MSB).
+
+            | (0xF);     // DSS (Data Size Select) = 0xF ? 16-bit data frames
+                        // SSI will transmit/receive 16 bits per frame.
+ 
+
+	SSI3->IM |= TXIM; // Unmask transmit FIFO interrupt
+	
+	// Pre-fill the FIFO array
+	for (int i=0; i<8; i++) {
+			uint16_t out = next_sample();
+			SSI3->DR = out;
+			SSI3->DR = out;
+	}
+
+	SSI3->CR1 |= (1<<1); // enable SSI3 again
 }
+
+void SSI3_Handler(void) {
+	if (SSI3->MIS & TXMIS) // if TX FIFO half empty interrupt
+	{
+		// Fill it up until its full
+		while (SSI3->SR & TNF)
+		{
+			uint16_t out = next_sample();
+			SSI3->DR = out; // L
+			SSI3->DR = out; // R
+		}
+	}
+}
+
+

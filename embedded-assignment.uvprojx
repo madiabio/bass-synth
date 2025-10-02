@@ -395,16 +395,6 @@
               <FilePath>.\main.c</FilePath>
             </File>
             <File>
-              <FileName>ES_Lib.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\ES_Lib.h</FilePath>
-            </File>
-            <File>
-              <FileName>ES_Library.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>.\ES_Library.lib</FilePath>
-            </File>
-            <File>
               <FileName>function_gen.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\function_gen.h</FilePath>
@@ -445,16 +435,6 @@
               <FilePath>.\input.c</FilePath>
             </File>
             <File>
-              <FileName>i2c.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\i2c.c</FilePath>
-            </File>
-            <File>
-              <FileName>i2c.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\i2c.h</FilePath>
-            </File>
-            <File>
               <FileName>adc.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\adc.c</FilePath>
@@ -483,6 +463,16 @@
               <FileName>LCD_Display.lib</FileName>
               <FileType>4</FileType>
               <FilePath>.\LCD_Display.lib</FilePath>
+            </File>
+            <File>
+              <FileName>ES.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\ES.h</FilePath>
+            </File>
+            <File>
+              <FileName>ES.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>.\ES.lib</FilePath>
             </File>
           </Files>
         </Group>

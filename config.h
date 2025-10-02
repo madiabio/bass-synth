@@ -2,14 +2,13 @@
 #define CONFIG_H
 
 // Core system definitions
-#define SYS_CLK_FREQ   16000000u   // system clock (Hz)
-// #define SAMPLE_FREQ  48000u      // audio sample rate = 48kHz (Hz)
-#define SAMPLE_FREQ 12000u // slower sample rate to work with i2c
+#define SYS_CLK_FREQ   250000000u   // system clock (Hz)
+#define SAMPLE_FREQ  48000u      // audio sample rate = 48kHz (Hz)
+// #define SAMPLE_FREQ 12000u // slower sample rate to work with i2c
 // Derived timer reload value
 #define TIMER0A_RELOAD  ((SYS_CLK_FREQ / SAMPLE_FREQ) - 1)
-// #define TIMER0A_RELOAD 79999   // 1 kHz for testing
 
 // Priorities
 #define PRIORITY_TIMER0A 2 // Function generator interrupt priority
-
+#define PRIORITY_SSI3 2 // Function generator to SSI interrupt priority
 #endif
