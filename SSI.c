@@ -6,7 +6,8 @@
 #include "function_gen.h" // for next_sample();
 #define SSI1_CPSR 2
 #define SSI1_SCR (6 << 8)
-
+#define SSI3_SCR (38 << 8)
+#define SSI3_CPSR 2
 void init_SSI1() // for the 12 bit DAC
 {
 	
@@ -85,49 +86,34 @@ void init_SSI3() // for I2S
 	while ( (SYSCTL->PRGPIO & (1<<14)) == 0) {}
 	
 	GPIOQ->DIR |= PQ3 | PQ1 | PQ0 ; // enable tx, fss, clk as output
-	GPIOQ->DIR &= ~(PQ2); // enable rx as input
-	GPIOQ->AFSEL |= PQ0 | PQ1 | PQ2 | PQ3; // enable all as alt functions
-	GPIOQ->PCTL |= (0xE << 0*4) | (0xE << 1*4) | (0xE << 2*4) | (0xE << 3*4); // Select SSI in PCTL
 	
-	GPIOQ->DEN |= PQ0 | PQ1 | PQ2 | PQ3; // enable all as digital
 	GPIOQ->PUR |= PQ0; // put PUR on clk
-		
-
-	// Enable NVIC for SSI3 for interrupts	
-	NVIC->IPR[55] = PRIORITY_SSI3;
-	NVIC->ISER[1] |= (1 << (55-32)); // enable IRQ 55
 	
+	GPIOQ->AFSEL |= PQ0 | PQ1 |  PQ3; // enable all as alt functions
+	GPIOQ->PCTL |= (0xE << 0*4) | (0xE << 1*4) | (0xE << 3*4); // Select SSI in PCTL
+		
+	GPIOQ->DEN |= PQ0 | PQ1 | PQ3; // enable all as digital
+		
 	SYSCTL->RCGCSSI |= (1<<3); // enable SSI3 clock
 	while ( (SYSCTL->PRSSI & (1<<3)) == 0) {} // wait
 	
-	SSI3->CR1 &= ~(1<<1); // disable SSI3
+	SSI3->CR1 &= ~(SSE); // disable SSI3
 	
-	// fSSI = f_sysclk / ( CPSDVSR * (1+SCR) ) = 1.536 MHz
-	// fSSI = 120 MHz / 10 = 1.6 MHz = 1.6 MHz (˜ 4% high)                                                                                 
-	SSI3->CPSR = 2; // fSSICLk = f_sysclk / (CPSDVSR * (1+SCR)); CPDVSR  = 48kHz*16; even prescalar
-	SSI3->CR0 = (38 << 8) // SCR (Serial Clock Rate) = 38
+	SSI3->CPSR = SSI3_CPSR ; 
+	SSI3->CR0 = SSI3_SCR // SCR (Serial Clock Rate)
                         // Together with CPSDVSR (from SSI3->CPSR), this divides the system clock:
                         // fSSI = f_sysclk / (CPSDVSR * (1 + SCR))
                         // This sets the bit clock frequency for I2S/SPI.
 
-            | (0x2 << 6) // SPO/SPH bits = 0b10
+            | (0 << 7) // SPO/SPH bits = 0b10
                         // Bit 7 = SPH = 1 ? data shifted/captured on second edge (adds 1-bit delay)
                         // Bit 6 = SPO = 0 ? clock idles low
                         // This combination matches I2S requirement (WS changes one bit before MSB).
+						| (1 << 6)
 
-            | (0xF);     // DSS (Data Size Select) = 0xF ? 16-bit data frames
+            | (0xF);    // DSS (Data Size Select) = 0xF ? 16-bit data frames
                         // SSI will transmit/receive 16 bits per frame.
  
-
-	SSI3->IM |= TXIM; // Unmask transmit FIFO interrupt
-	
-	// Pre-fill the FIFO array
-	for (int i=0; i<8; i++) {
-			uint16_t out = next_sample();
-			SSI3->DR = out << 4; // temp shifting
-			SSI3->DR = out << 4; // temp shifting 
-	}
-
 	SSI3->CR1 |= (1<<1); // enable SSI3 again
 }
 

@@ -24,6 +24,21 @@
 // ************* main function ***********************
 int main(void)
 {
+	/*
+	init_SSI3();
+	while(true) 
+	{
+		while ((SSI3->SR & TNF) == 0){
+		}
+		SSI3->DR = 0x55AA;
+		while (SSI3->SR & (1 << 4)) {
+    // wait until BSY = 0
+		}
+
+	}  // loop forever
+	*/
+	
+	
 	init_SSI1();
 	while(true) 
 	{
@@ -32,8 +47,10 @@ int main(void)
 		SSI1->DR = 0x55AA;
 		while (SSI1->SR & (1 << 4)) {
     // wait until BSY = 0
-}
+		}
 
 	}  // loop forever
+	
+
 	return 0;
 }
