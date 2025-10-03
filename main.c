@@ -24,7 +24,6 @@
 // ************* main function ***********************
 int main(void)
 {
-	/*
 	init_SSI3();
 	while(true) 
 	{
@@ -36,9 +35,9 @@ int main(void)
 		}
 
 	}  // loop forever
-	*/
 	
 	
+	/*
 	init_SSI1();
 	while(true) 
 	{
@@ -50,7 +49,7 @@ int main(void)
 		}
 
 	}  // loop forever
-	
+	*/
 
 	return 0;
 }

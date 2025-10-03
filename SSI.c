@@ -42,7 +42,6 @@ void init_SSI1() // for the 12 bit DAC
 						| (0xF);     // 16-bit data
 	
 	SSI1->CR1 |= SSE; // Enable SSI1
-	
 }
 
 void initSPI(void) {
@@ -85,14 +84,14 @@ void init_SSI3() // for I2S
 	SYSCTL->RCGCGPIO |= (1 << 14);
 	while ( (SYSCTL->PRGPIO & (1<<14)) == 0) {}
 	
-	GPIOQ->DIR |= PQ3 | PQ1 | PQ0 ; // enable tx, fss, clk as output
+	GPIOQ->DIR |= PQ2 | PQ1 | PQ0 ; // enable tx, fss, clk as output
 	
 	GPIOQ->PUR |= PQ0; // put PUR on clk
 	
-	GPIOQ->AFSEL |= PQ0 | PQ1 |  PQ3; // enable all as alt functions
-	GPIOQ->PCTL |= (0xE << 0*4) | (0xE << 1*4) | (0xE << 3*4); // Select SSI in PCTL
+	GPIOQ->AFSEL |= PQ0 | PQ1 |  PQ2; // enable all as alt functions
+	GPIOQ->PCTL |= (0xE << 0*4) | (0xE << 1*4) | (0xE << 2*4); // Select SSI in PCTL
 		
-	GPIOQ->DEN |= PQ0 | PQ1 | PQ3; // enable all as digital
+	GPIOQ->DEN |= PQ0 | PQ1 | PQ2; // enable all as digital
 		
 	SYSCTL->RCGCSSI |= (1<<3); // enable SSI3 clock
 	while ( (SYSCTL->PRSSI & (1<<3)) == 0) {} // wait
@@ -100,30 +99,11 @@ void init_SSI3() // for I2S
 	SSI3->CR1 &= ~(SSE); // disable SSI3
 	
 	SSI3->CPSR = SSI3_CPSR ; 
-	SSI3->CR0 = SSI3_SCR // SCR (Serial Clock Rate)
-                        // Together with CPSDVSR (from SSI3->CPSR), this divides the system clock:
-                        // fSSI = f_sysclk / (CPSDVSR * (1 + SCR))
-                        // This sets the bit clock frequency for I2S/SPI.
-
-            | (0 << 7) // SPO/SPH bits = 0b10
-                        // Bit 7 = SPH = 1 ? data shifted/captured on second edge (adds 1-bit delay)
-                        // Bit 6 = SPO = 0 ? clock idles low
-                        // This combination matches I2S requirement (WS changes one bit before MSB).
-						| (1 << 6)
-
-            | (0xF);    // DSS (Data Size Select) = 0xF ? 16-bit data frames
-                        // SSI will transmit/receive 16 bits per frame.
+	SSI3->CR0 = SSI3_SCR   // SCR
+						| (0 << 7)   // SPO
+						| (1 << 6)   // SPH
+						| (0xF);     // 16-bit data
  
 	SSI3->CR1 |= (1<<1); // enable SSI3 again
-}
-
-void SSI3_Handler(void) {
-    if (SSI3->MIS & TXMIS) {
-        while (SSI3->SR & TNF) {
-            uint16_t sample = next_sample();
-            SSI3->DR = sample << 4; // L
-            SSI3->DR = sample << 4; // R
-        }
-    }
 }
 

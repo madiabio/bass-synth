@@ -9,8 +9,8 @@
 // SSI3 -> I2S sound chip
 #define PQ0 (1<<0) // SSI3Clk
 #define PQ1 (1<<1) // SSI3Fss
-#define PQ2 (1<<2) // SSI3XDAT0 (unused) Rx
-#define PQ3 (1<<3) // SSI3XDAT1 Tx
+#define PQ2 (1<<2) // SSI3XDAT0 TX
+#define PQ3 (1<<3) // SSI3XDAT1 RX (UNUSED)
 
 // SSI2 -> Display
 #define PD0 (1<<0) // SSI2XDAT1 Tx
