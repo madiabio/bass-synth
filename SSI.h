@@ -3,8 +3,8 @@
 // SSI1 -> 12 bit DAC
 #define PB4 (1<<4) // SSI1Fss
 #define PB5 (1<<5) // SSI1Clk
-#define PE4	(1<<4) // SSI1XDAT0 (unused) Rx
-#define PE5 (1<<5) // SSI1XDAT1 Tx
+#define PE4	(1<<4) // SSI1XDAT0 TX
+#define PE5 (1<<5) // SSI1XDAT1 Rx (UNUSED)
 
 // SSI3 -> I2S sound chip
 #define PQ0 (1<<0) // SSI3Clk

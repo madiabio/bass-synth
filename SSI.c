@@ -4,8 +4,8 @@
 #include "SSI.h"
 #include "config.h" // for priorities
 #include "function_gen.h" // for next_sample();
-#define SSI1_CPSR 2
-#define SSI1_SCR (6 << 8)
+#define SSI1_CPSR 254
+#define SSI1_SCR (245 << 8)
 #define SSI3_SCR (38 << 8)
 #define SSI3_CPSR 2
 void init_SSI1() // for the 12 bit DAC
@@ -14,17 +14,17 @@ void init_SSI1() // for the 12 bit DAC
 	SYSCTL->RCGCGPIO |= (1<<1) | (1<<4); // enable GPIOB, GPIOE
 	while ( (SYSCTL->PRGPIO & ((1<<1) | (1<<4))) == 0 ) {}
 	GPIOB_AHB->DIR |= PB4 | PB5;  // enable Tx, Fss, Clk be output
-	GPIOE_AHB->DIR |= PE5;
+	GPIOE_AHB->DIR |= PE4;
 	
 	GPIOE_AHB->DIR &= ~(PE4); // enable Rx to be input
 	GPIOB_AHB->AFSEL |= (PB4 | PB5); // set Tx, Fss, Rx and Clk to be alt function
-	GPIOE_AHB->AFSEL |= (PE4 | PE5);
+	GPIOE_AHB->AFSEL |= (PE4);
 		
 	GPIOB_AHB->PCTL |= (0xF << (4*4)) | (0xF << (5*4)); // Select alt function with PCTL
 	GPIOE_AHB->PCTL |= (0xF << (4*4)) | (0xF << (5*4));
 		
 	GPIOB_AHB->DEN |= PB4 | PB5; // Enable all to be digital
-	GPIOE_AHB->DEN |= PE4 | PE5;
+	GPIOE_AHB->DEN |= PE4;
 	
 	GPIOB_AHB->PUR|= PB5; // Set clk pin to have PUR
 		
