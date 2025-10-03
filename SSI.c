@@ -4,10 +4,7 @@
 #include "SSI.h"
 #include "config.h" // for priorities
 #include "function_gen.h" // for next_sample();
-#define SSI1_CPSR 254
-#define SSI1_SCR (245 << 8)
-#define SSI3_SCR (38 << 8)
-#define SSI3_CPSR 2
+
 void init_SSI1() // for the 12 bit DAC
 {
 	
@@ -60,8 +57,8 @@ void initSPI(void) {
 
 	SSI2->CR1 = 0;                // legacy, master
 	SSI2->ICR = 0x3;              // clear ROR/RT
-	SSI2->CPSR = 10;              // prescale
-	SSI2->CR0  = (5<<8) | (1<<7) | (1<<6) | 0x7; // SCR=5, SPO=1, SPH=1, 8-bit
+	SSI2->CPSR = SSI2_CPSR;              // prescale
+	SSI2->CR0  = SSI2_SCR | (1<<7) | (1<<6) | 0x7; // SCR=5, SPO=1, SPH=1, 8-bit
 	SSI2->CR1 |= (1<<1);          // SSE enable
 
 	// idle levels

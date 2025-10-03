@@ -74,5 +74,6 @@ void test_display()
 // ************* main function ***********************
 int main(void)
 {
+	test_display();
 	return 0;
 }
