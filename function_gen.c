@@ -16,7 +16,7 @@
 volatile uint16_t audio_buf[AUDIO_BUF_SIZE];
 volatile int buf_index = 0;
 
-volatile waveform_t waveform_mode = WAVE_SQUARE;  // default to saw
+volatile waveform_t waveform_mode = WAVE_SINE;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
 volatile uint32_t phase_step = 56229845; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
 volatile uint16_t current_sample = 0; // current global sample

@@ -20,9 +20,39 @@
 #define WAVEFORM_AREA_WIDTH WAVE_BUF_LEN
 #define WAVEFORM_COLOR ILI9341_CYAN
 
+void test_I2S_circuit()
+{
+	init_sine_table();
+	init_SSI3();
+	while(true) 
+	{
+		while ((SSI3->SR & TNF) == 0){
+		}
+		SSI3->DR = next_sample();
+		while (SSI3->SR & (1 << 4)) {
+    // wait until BSY = 0
+		}
 
-// ************* main function ***********************
-int main(void)
+	}  // loop forever
+}
+
+void test_SSI1()
+{
+	init_SSI1();
+	while(true) 
+	{
+		while ((SSI1->SR & TNF) == 0){
+		}
+		SSI1->DR = 0x55AA;
+		while (SSI1->SR & (1 << 4)) {
+    // wait until BSY = 0
+		}
+
+	}  // loop forever
+
+}
+
+void test_display()
 {
 	initSPI();
 	initLCD();
@@ -40,35 +70,9 @@ int main(void)
 	{
 		
 	}  // loop forever
-
-	
-	/*
-	init_SSI3();
-	while(true) 
-	{
-		while ((SSI3->SR & TNF) == 0){
-		}
-		SSI3->DR = 0x55AA;
-		while (SSI3->SR & (1 << 4)) {
-    // wait until BSY = 0
-		}
-
-	}  // loop forever
-	*/
-	
-	/*
-	init_SSI1();
-	while(true) 
-	{
-		while ((SSI1->SR & TNF) == 0){
-		}
-		SSI1->DR = 0x55AA;
-		while (SSI1->SR & (1 << 4)) {
-    // wait until BSY = 0
-		}
-
-	}  // loop forever
-	*/
-
+}
+// ************* main function ***********************
+int main(void)
+{
 	return 0;
 }
