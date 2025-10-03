@@ -23,3 +23,7 @@
 #define PRIORITY_TIMER0A 2 // Function generator interrupt priority
 #define PRIORITY_SSI3 2 // Function generator to SSI interrupt priority
 #endif
+
+// DMA Ping-Pong Buffer Frame Count
+#define FRAME_COUNT 256
+

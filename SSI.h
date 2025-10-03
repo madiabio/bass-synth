@@ -18,6 +18,7 @@
 #define PD2 (1<<2) // SS2Fss
 #define PD3 (1<<3) // SSI2Clk
 
+// general SSI
 #define TXIM (1<<3) // QSSI Transmit FIFO Interrupt Mask
 #define TXMIS (1<<3) // QSSI Transmit FIFO Masked Interrupt Status
 #define SSE (1<<1) // QSSI Synchronous Serial Port Enable
@@ -26,6 +27,10 @@
 #define SPO (1<<6) // QSSI Serial Clock Polarity
 #define RNE (1<<2) // QSSI Receive FIFO Not Empty
 
+// DMA for SSI
+#define DMATXIM (1<<5)  // QSSI Transmit DMA Interrupt Mask
+#define DMATXMIS (1<<5) // QSSI Transmit DMA Masked Interrupt Status
+#define DMATXIC (1<<5)  // QSSI Transmit DMA Interrupt Clear (writing a 1 to this clears DMATXRIS bit in SSIRIS and DMATXMIS in SSIMIS)
 
 void init_SSI1(); // for 12-bit DAC
 void init_SSI3(); // for I2S DAC

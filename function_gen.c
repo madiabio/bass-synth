@@ -5,16 +5,12 @@
 #include <stdbool.h>
 #include "ES_Lib.h"
 #include "function_gen.h"
-#include "config.h" 
 #include "waveforms.h" // for sine wave
 #include "notes.h" // for notes dict
 #include "i2c.h" // for mcp4275_write()
 #include "SSI.h" // for 
 #include "LCD_Display.h"
 #define DRAW_DECIMATE 64
-
-volatile uint16_t audio_buf[AUDIO_BUF_SIZE];
-volatile int buf_index = 0;
 
 volatile waveform_t waveform_mode = WAVE_SINE;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
@@ -23,65 +19,6 @@ volatile uint16_t current_sample = 0; // current global sample
 static int16_t x_pos = 0;
 static int16_t prev_x = 0;
 static int16_t prev_y = ILI9341_TFTHEIGHT / 2; // start mid-screen
-
-
-#define WAVEFORM_CAPTURE_DOWNSAMPLE 64
-
-static volatile uint16_t waveform_buffers[2][WAVE_BUF_LEN];
-static volatile uint16_t waveform_write_index = 0;
-static volatile uint8_t waveform_write_buffer = 0;
-static volatile uint8_t waveform_ready_buffer = 0xFF;
-static volatile bool waveform_ready_flag = false;
-
-static inline void capture_waveform_sample(uint16_t sample)
-{
-    static uint16_t downsample_counter = 0;
-
-    if (++downsample_counter < WAVEFORM_CAPTURE_DOWNSAMPLE) {
-        return;
-    }
-
-    downsample_counter = 0;
-
-    waveform_buffers[waveform_write_buffer][waveform_write_index++] = sample;
-
-    if (waveform_write_index >= WAVE_BUF_LEN) {
-        waveform_ready_buffer = waveform_write_buffer;
-        waveform_write_buffer ^= 1;
-        waveform_write_index = 0;
-        waveform_ready_flag = true;
-    }
-}
-
-bool function_gen_waveform_ready(void)
-{
-    return waveform_ready_flag;
-}
-
-size_t function_gen_copy_waveform(uint16_t *dest, size_t max_samples)
-{
-    if ((dest == NULL) || (max_samples < WAVE_BUF_LEN)) {
-        return 0;
-    }
-
-    size_t copied = 0;
-
-    __disable_irq();
-
-    if (waveform_ready_flag && waveform_ready_buffer <= 1) {
-        for (size_t i = 0; i < WAVE_BUF_LEN; ++i) {
-            dest[i] = waveform_buffers[waveform_ready_buffer][i];
-        }
-
-        waveform_ready_flag = false;
-        waveform_ready_buffer = 0xFF;
-        copied = WAVE_BUF_LEN;
-    }
-
-    __enable_irq();
-
-    return copied;
-}
 
 
 // for testing
@@ -147,7 +84,6 @@ uint16_t next_sample(void) {
     }
 		
 		current_sample = sample; // update global copy
-    capture_waveform_sample(sample);
 
     return sample;   // align 12-bit to 16-bit (TEMP)
 }
@@ -158,4 +94,14 @@ uint16_t next_sample(void) {
 void TIMER0A_Handler(void) {
 	TIMER0->ICR = 1; // clear flag
 	// draw();
+}
+
+void fillPingBuffer()
+{
+	return;
+}
+
+void fillPongBuffer()
+{
+	return;
 }

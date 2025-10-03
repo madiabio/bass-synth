@@ -4,7 +4,7 @@
 #include "SSI.h"
 #include "config.h" // for priorities
 #include "function_gen.h" // for next_sample();
-
+#include "dma.h"
 void init_SSI1() // for the 12 bit DAC
 {
 	
@@ -101,6 +101,44 @@ void init_SSI3() // for I2S
 						| (1 << 6)   // SPH
 						| (0xF);     // 16-bit data
  
+	// DMA SETUP
+	SSI3->DMACTL |= (1<<1); // Transmit DMA Enable
+	SSI3->IM |= DMATXIM; // Enable QSSI Transmit DMA Maksed Interrupt
+	
+		
 	SSI3->CR1 |= (1<<1); // enable SSI3 again
 }
+
+void SSI3_Handler(void)
+{
+	if (SSI3->MIS & DMATXMIS) {
+		SSI3->ICR = DMATXIC; // clear DMATXRIS and DMATXMIS
+		
+		// 1. Disable TXDMAE before clearing interrupt
+		SSI3->DMACTL &= ~(1 << 0);     // clear TXDMAE (check)
+
+		// 2. Clear SSI DMA TX interrupt
+		SSI3->ICR = DMATXIC;          // DMATXIC (check)
+
+		// 3. Check primary (Ping, channel 15)
+		if ((uDMAControlTable[15].control & 0x7) == UDMA_MODE_STOP) {
+				fillPingBuffer(pingBuffer, FRAME_COUNT);
+
+				uDMAControlTable[15].srcEndAddr = &pingBuffer[FRAME_COUNT - 1];
+				uDMAControlTable[15].control    = UDMA_CFG_CTL(FRAME_COUNT);
+		}
+
+		// 4. Check alternate (Pong, channel 15+32 = 47)
+		if ((uDMAControlTable[15+32].control & 0x7) == UDMA_MODE_STOP) {
+				fillPongBuffer(pongBuffer, FRAME_COUNT);
+
+				uDMAControlTable[15+32].srcEndAddr = &pongBuffer[FRAME_COUNT - 1];
+				uDMAControlTable[15+32].control    = UDMA_CFG_CTL(FRAME_COUNT);
+		}
+
+		// 5. Re-enable TXDMAE so SSI3 can request again
+		SSI3->DMACTL |= (1 << 0);      // set TXDMAE
+
+
+	}
 

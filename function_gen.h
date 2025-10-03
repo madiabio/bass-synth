@@ -3,12 +3,12 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "config.h"
 
 #define FUNCTION_GEN_H
 #define WAVE_BUF_LEN 240
 #define PG1 (1<<1)
 #define PK4 (1<<4)
-#define AUDIO_BUF_SIZE 4800   // 0.1 sec at 48 kHz
 
 // Handles waveform mode
 typedef enum {
@@ -24,12 +24,9 @@ extern volatile uint32_t phase_acc;
 extern volatile uint32_t phase_step;
 extern volatile uint16_t current_sample;
 
-extern volatile uint16_t audio_buf[AUDIO_BUF_SIZE];
-extern volatile int buf_index;
 uint16_t next_sample(void);
-
-bool function_gen_waveform_ready(void);
-size_t function_gen_copy_waveform(uint16_t *dest, size_t max_samples);
+void fillPingBuffer();
+void fillPongBuffer();
 
 
 void draw();
