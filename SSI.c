@@ -4,18 +4,13 @@
 #include "SSI.h"
 #include "config.h" // for priorities
 #include "function_gen.h" // for next_sample();
-#define TXIM (1<<3) // QSSI Transmit FIFO Interrupt Mask
-#define TXMIS (1<<3) // QSSI Transmit FIFO Masked Interrupt Status
-#define SSE (1<<1) // QSSI Synchronous Serial Port Enable
-#define TNF (1<<1) // QSSI Transmit FIFO Not Full
-#define SPH (1<<7) // QSSI Serial Clock phase
-#define SPO (1<<6) // QSSI Serial Clock Polarity
-#define RNE (1<<2) // QSSI Receive FIFO Not Empty
+#define SSI1_CPSR 2
+#define SSI1_SCR (6 << 8)
 
 void init_SSI1() // for the 12 bit DAC
 {
 	
-	SYSCTL->RCGCGPIO |= (1<<1) | (1<<4); // enable GPIOA
+	SYSCTL->RCGCGPIO |= (1<<1) | (1<<4); // enable GPIOB, GPIOE
 	while ( (SYSCTL->PRGPIO & ((1<<1) | (1<<4))) == 0 ) {}
 	GPIOB_AHB->DIR |= PB4 | PB5;  // enable Tx, Fss, Clk be output
 	GPIOE_AHB->DIR |= PE5;
@@ -24,8 +19,8 @@ void init_SSI1() // for the 12 bit DAC
 	GPIOB_AHB->AFSEL |= (PB4 | PB5); // set Tx, Fss, Rx and Clk to be alt function
 	GPIOE_AHB->AFSEL |= (PE4 | PE5);
 		
-	GPIOB_AHB->PCTL |= (0x15 << (4*4)) | (0x15 << (5*4)); // Select alt function with PCTL
-	GPIOE_AHB->PCTL |= (0x15 << (4*4)) | (0x15 << (5*4));
+	GPIOB_AHB->PCTL |= (0xF << (4*4)) | (0xF << (5*4)); // Select alt function with PCTL
+	GPIOE_AHB->PCTL |= (0xF << (4*4)) | (0xF << (5*4));
 		
 	GPIOB_AHB->DEN |= PB4 | PB5; // Enable all to be digital
 	GPIOE_AHB->DEN |= PE4 | PE5;
@@ -37,10 +32,10 @@ void init_SSI1() // for the 12 bit DAC
 			
 	SSI1->CR1 &= ~(SSE); // disable SSI1
 	
-	SSI1->CPSR = 2; 
+	SSI1->CPSR = SSI1_CPSR; 
 	
 	// Configure CR0: SCR, mode, data size
-	SSI1->CR0 = (6 << 8)   // SCR=6, ~1.14 MHz
+	SSI1->CR0 = SSI1_SCR   // SCR=6, ~1.14 MHz
 						| (0 << 7)   // SPO=0
 						| (1 << 6)   // SPH=1 (mode 1)
 						| (0xF);     // 16-bit data
@@ -142,9 +137,6 @@ void SSI3_Handler(void) {
             uint16_t sample = next_sample();
             SSI3->DR = sample << 4; // L
             SSI3->DR = sample << 4; // R
-
-            audio_buf[buf_index++] = sample;
-            if (buf_index >= AUDIO_BUF_SIZE) buf_index = 0;
         }
     }
 }

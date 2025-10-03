@@ -18,6 +18,14 @@
 #define PD2 (1<<2) // SS2Fss
 #define PD3 (1<<3) // SSI2Clk
 
+#define TXIM (1<<3) // QSSI Transmit FIFO Interrupt Mask
+#define TXMIS (1<<3) // QSSI Transmit FIFO Masked Interrupt Status
+#define SSE (1<<1) // QSSI Synchronous Serial Port Enable
+#define TNF (1<<1) // QSSI Transmit FIFO Not Full
+#define SPH (1<<7) // QSSI Serial Clock phase
+#define SPO (1<<6) // QSSI Serial Clock Polarity
+#define RNE (1<<2) // QSSI Receive FIFO Not Empty
+
 
 void init_SSI1(); // for 12-bit DAC
 void init_SSI3(); // for I2S DAC
