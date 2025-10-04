@@ -31,7 +31,7 @@ void fillPingBuffer(uint16_t *buffer, size_t frameCount);
 void fillPongBuffer(uint16_t *buffer, size_t frameCount);
 
 // Used for displaying mono 
-uint16_t display_buffer[SCOPE_BUFFER_SIZE];
+extern uint16_t display_buffer[SCOPE_BUFFER_SIZE];
 extern volatile size_t scope_write_index;
 
 void draw();

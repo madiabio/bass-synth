@@ -20,9 +20,8 @@ static int16_t prev_x = 0;
 static int16_t prev_y = ILI9341_TFTHEIGHT / 2; // start mid-screen
 
 volatile int current_channel = 0; // 0 = Left, 1 = Right
-uint16_t display_buffer[SCOPE_BUFFER_SIZE]; // ring buffer for display
 volatile size_t scope_write_index = 0;
-
+uint16_t display_buffer[SCOPE_BUFFER_SIZE];
 
 // for testing
 void init_PG1()

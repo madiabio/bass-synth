@@ -14,11 +14,6 @@
 #include "LCD_Display.h"
 #include "SSI.h" // for initSPI(), init_SSI0()
 
-#define WAVEFORM_AREA_X 0
-#define WAVEFORM_AREA_Y 160
-#define WAVEFORM_AREA_HEIGHT 120
-#define WAVEFORM_AREA_WIDTH WAVE_BUF_LEN
-#define WAVEFORM_COLOR ILI9341_CYAN
 
 void test_I2S_circuit()
 {
