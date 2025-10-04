@@ -13,21 +13,15 @@
 
 #include "LCD_Display.h"
 #include "SSI.h" // for initSPI(), init_SSI0()
-
+#include "dma.h"
 
 void test_I2S_circuit()
 {
 	init_sine_table();
+	init_dma();
 	init_SSI3();
 	while(true) 
 	{
-		while ((SSI3->SR & TNF) == 0){
-		}
-		SSI3->DR = next_sample();
-		while (SSI3->SR & (1 << 4)) {
-    // wait until BSY = 0
-		}
-
 	}  // loop forever
 }
 
