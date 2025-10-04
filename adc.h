@@ -1,5 +1,5 @@
 #include <stdint.h>
+#define PD7 (1<<7)
 
-void init_adc(); 
-void initSPI();
-void spi_Transmit(uint8_t data)
+void init_button_PD7(); 
+

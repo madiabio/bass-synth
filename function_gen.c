@@ -11,7 +11,7 @@
 #include "SSI.h" // for 
 #include "LCD_Display.h"
 
-volatile waveform_t waveform_mode = WAVE_SINE;  // default to saw
+volatile waveform_t waveform_mode = WAVE_SAW;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
 volatile uint32_t phase_step = 56229845; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
 volatile uint16_t prev_sample = 0; // current global sample
@@ -109,7 +109,9 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
 	for (size_t i = 0; i < frameCount; i++)
 	{
     uint16_t sample = next_sample(); // next_sample updates current_channel
-    buffer[i] = sample;
+    current_channel ^= 1; 	// switch channel
+		buffer[i] = sample; 	// push sample into buffer
+		/*
 		if (current_channel == 0) // if left channel, push sample to display buffer, update scope idx.
 		{
 			display_buffer[scope_write_index++] = sample; 
@@ -119,6 +121,8 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
 				scope_write_index = 0;
 			}
 		}
+		*/
+	
 	}
 }
 

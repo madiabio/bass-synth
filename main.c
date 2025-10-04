@@ -15,6 +15,8 @@
 #include "SSI.h" // for initSPI(), init_SSI0()
 #include "dma.h"
 
+#include "adc.h"
+
 void test_I2S_circuit()
 {
 	init_sine_table();
@@ -23,6 +25,21 @@ void test_I2S_circuit()
 	while(true) 
 	{
 	}  // loop forever
+}
+
+void test_button_ADC()
+{
+    init_button_PD7();
+    init_PG1();
+
+    while(1) {
+        if((GPIOD_AHB->DATA & PD7) == 0) { // button pressed (low)
+            GPIOG_AHB->DATA |= PG1;        // LED on
+        } else {
+            GPIOG_AHB->DATA &= ~PG1;       // LED off
+        }
+    }
+
 }
 
 void test_SSI1()
@@ -63,6 +80,6 @@ void test_display()
 // ************* main function ***********************
 int main(void)
 {
-	test_I2S_circuit();
+	test_button_ADC();
 	return 0;
 }
