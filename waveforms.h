@@ -2,9 +2,7 @@
 #define WAVEFORMS_H
 
 #include <stdint.h>
-
-#define TABLE_SIZE 256
-#define DAC_MAX    4095
+#include "config.h"
 
 extern uint16_t sine_table[TABLE_SIZE];
 

@@ -153,7 +153,7 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
     uint16_t sample = next_sample(); // next_sample updates current_channel
     current_channel ^= 1; 	// switch channel
 		buffer[i] = sample; 	// push sample into buffer
-		/*
+	
 		if (current_channel == 0) // if left channel, push sample to display buffer, update scope idx.
 		{
 			display_buffer[scope_write_index++] = sample; 
@@ -163,7 +163,7 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
 				scope_write_index = 0;
 			}
 		}
-		*/
+	
 	
 	}
 }
