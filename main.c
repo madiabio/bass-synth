@@ -16,29 +16,35 @@
 #include "dma.h"
 
 #include "adc.h"
+uint8_t prev_button_edge  = 1;   // track previous button state
+
 
 void test_I2S_circuit()
 {
 	init_sine_table();
 	init_dma();
 	init_SSI3();
-	while(true) 
-	{
-	}  // loop forever
 }
 
-void test_button_ADC()
+void test_button()
 {
     init_button_PD7();
     init_PG1();
+		init_PK4();
 
-    while(1) {
-        if((GPIOD_AHB->DATA & PD7) == 0) { // button pressed (low)
-            GPIOG_AHB->DATA |= PG1;        // LED on
-        } else {
-            GPIOG_AHB->DATA &= ~PG1;       // LED off
-        }
-    }
+
+}
+
+void handle_waveform_state()
+{
+	uint8_t now = (GPIOD_AHB->DATA & PD7) ? 1 : 0;
+
+	if(prev_button_edge == 1 && now == 0) {   // detect falling edge (press)
+		waveform_mode = (waveform_t)((waveform_mode + 1) & 0x3);
+		update_LEDs();
+		for(volatile int i=0; i<50000; i++); // crude debounce ~5–10ms
+	}
+	prev_button_edge  = now;
 
 }
 
@@ -80,6 +86,12 @@ void test_display()
 // ************* main function ***********************
 int main(void)
 {
-	test_button_ADC();
+	test_button();
+	test_I2S_circuit();
+	while(true) 
+	{
+		handle_waveform_state();
+	}  // loop forever
+
 	return 0;
 }

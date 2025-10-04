@@ -45,6 +45,48 @@ void init_PK4()
 	GPIOK->DATA &= ~PK4;
 }
 
+void init_button_PD7()
+{
+	// 1. GPIO Clock Enable and Wait (Port D, Bit 3)
+	SYSCTL->RCGCGPIO |= (1<<3); // Enable clock for GPIO D
+	while ( (SYSCTL->PRGPIO & (1<<3)) == 0 ) {} // Wait for Port D to stabilize
+	
+	// --- COMMIT CONTROL: REQUIRED FOR PD7 ---
+	// PD7 is locked. Must unlock GPIOLOCK and set GPIOCR bit 7 before configuration.
+		
+	// 1.1 Unlock GPIOLOCK register (Magic value 0x4C4F.434B)
+	GPIOD_AHB->LOCK = 0x4C4F434B; 
+
+	// 1.2 Enable commit control for PD7 (Bit 7) in GPIOCR
+	*((volatile uint32_t *)(&GPIOD_AHB->CR)) |= (1<<7);  // Get the address of CR, cast it to a pointer to a volatile unsigned integer, and dereference it.
+
+	GPIOD_AHB->DIR  &= ~PD7;   // input
+	GPIOD_AHB->DEN  |= PD7;    // digital enable
+	GPIOD_AHB->PUR  |= PD7;    // pull-up
+
+	GPIOD_AHB->LOCK = 0;  // re-lock GPIO port
+}
+
+void update_LEDs() {
+    uint32_t bits = 0;
+
+    switch(waveform_mode) {
+        case WAVE_SINE:    bits = 0b00; break;
+        case WAVE_SAW:     bits = 0b01; break;
+        case WAVE_TRI:     bits = 0b10; break;
+        case WAVE_SQUARE:  bits = 0b11; break;
+    }
+
+    // Clear both outputs first
+    GPIOG_AHB->DATA &= ~PG1;
+    GPIOK->DATA     &= ~PK4;
+
+    // Then set according to bits
+    if(bits & 0b10) GPIOG_AHB->DATA |= PG1; // MSB
+    if(bits & 0b01) GPIOK->DATA     |= PK4; // LSB
+}
+
+
 void init_timer0a() {
     SYSCTL->RCGCTIMER |= (1<<0); // enable timer 0 clock
 		while((SYSCTL->PRTIMER & (1 << 0)) == 0) {}// Wait until ready

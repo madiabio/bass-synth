@@ -56,25 +56,3 @@ void init_adc()
 }
 */
 
-void init_button_PD7()
-{
-	// 1. GPIO Clock Enable and Wait (Port D, Bit 3)
-	SYSCTL->RCGCGPIO |= (1<<3); // Enable clock for GPIO D
-	while ( (SYSCTL->PRGPIO & (1<<3)) == 0 ) {} // Wait for Port D to stabilize
-	
-	// --- COMMIT CONTROL: REQUIRED FOR PD7 ---
-	// PD7 is locked. Must unlock GPIOLOCK and set GPIOCR bit 7 before configuration.
-		
-	// 1.1 Unlock GPIOLOCK register (Magic value 0x4C4F.434B)
-	GPIOD_AHB->LOCK = 0x4C4F434B; 
-
-	// 1.2 Enable commit control for PD7 (Bit 7) in GPIOCR
-	*((volatile uint32_t *)(&GPIOD_AHB->CR)) |= (1<<7);  // Get the address of CR, cast it to a pointer to a volatile unsigned integer, and dereference it.
-
-	GPIOD_AHB->DIR  &= ~PD7;   // input
-	GPIOD_AHB->DEN  |= PD7;    // digital enable
-	GPIOD_AHB->PUR  |= PD7;    // pull-up
-
-	GPIOD_AHB->LOCK = 0;  // re-lock GPIO port
-}
-
