@@ -21,9 +21,10 @@
 
 // Priorities
 #define PRIORITY_TIMER0A 2 // Function generator interrupt priority
-#define PRIORITY_SSI3 2 // Function generator to SSI interrupt priority
-#endif
+#define PRIORITY_SSI3 2 // DMA ping pong to SSI3 I2S interrupt priority
 
 // DMA Ping-Pong Buffer Frame Count
 #define FRAME_COUNT 256
+#define SCOPE_BUFFER_SIZE  320 // ring scope buffer for display (mono)
 
+#endif

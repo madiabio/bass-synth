@@ -23,11 +23,16 @@ extern volatile waveform_t waveform_mode;
 extern volatile uint32_t phase_acc;
 extern volatile uint32_t phase_step;
 extern volatile uint16_t current_sample;
-
+extern volatile int current_channel; // 0 = Left, 1 = Right
 uint16_t next_sample(void);
-void fillPingBuffer();
-void fillPongBuffer();
 
+// Used for DMA to send sample to SSI3 for I2S DAC output
+void fillPingBuffer(uint16_t *buffer, size_t frameCount);
+void fillPongBuffer(uint16_t *buffer, size_t frameCount);
+
+// Used for displaying mono 
+uint16_t display_buffer[SCOPE_BUFFER_SIZE];
+extern volatile size_t scope_write_index;
 
 void draw();
 

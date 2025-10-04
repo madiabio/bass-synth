@@ -10,15 +10,18 @@
 #include "i2c.h" // for mcp4275_write()
 #include "SSI.h" // for 
 #include "LCD_Display.h"
-#define DRAW_DECIMATE 64
 
 volatile waveform_t waveform_mode = WAVE_SINE;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
 volatile uint32_t phase_step = 56229845; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
-volatile uint16_t current_sample = 0; // current global sample
+volatile uint16_t prev_sample = 0; // current global sample
 static int16_t x_pos = 0;
 static int16_t prev_x = 0;
 static int16_t prev_y = ILI9341_TFTHEIGHT / 2; // start mid-screen
+
+volatile int current_channel = 0; // 0 = Left, 1 = Right
+uint16_t display_buffer[SCOPE_BUFFER_SIZE]; // ring buffer for display
+volatile size_t scope_write_index = 0;
 
 
 // for testing
@@ -61,31 +64,36 @@ void init_timer0a() {
 }
 
 uint16_t next_sample(void) {
-    phase_acc += phase_step;
-    uint16_t sample = 0;
-
-    switch (waveform_mode) {
-        case WAVE_SINE: {
-            uint16_t idx = PHASE_TO_INDEX(phase_acc, TABLE_SIZE);
-            sample = sine_table[idx];
-            break;
-        }
-        case WAVE_SAW:
-            sample = phase_acc >> 20;
-            break;
-        case WAVE_TRI: {
-            uint16_t saw = phase_acc >> 20;
-            sample = (saw < 2048) ? (saw * 2) : ((4095 - saw) * 2);
-            break;
-        }
-        case WAVE_SQUARE:
-            sample = (phase_acc & 0x80000000) ? 4095 : 0;
-            break;
-    }
-		
-		current_sample = sample; // update global copy
-
-    return sample;   // align 12-bit to 16-bit (TEMP)
+    uint16_t sample;
+		if (current_channel == 0) // LEFT CHANNEL
+		{
+			
+			switch (waveform_mode) {
+					case WAVE_SINE: {
+							uint16_t idx = PHASE_TO_INDEX(phase_acc, TABLE_SIZE);
+							sample = sine_table[idx];
+							break;
+					}
+					case WAVE_SAW:
+							sample = phase_acc >> 20;
+							break;
+					case WAVE_TRI: {
+							uint16_t saw = phase_acc >> 20;
+							sample = (saw < 2048) ? (saw * 2) : ((4095 - saw) * 2);
+							break;
+					}
+					case WAVE_SQUARE:
+							sample = (phase_acc & 0x80000000) ? 4095 : 0;
+							break;
+			}
+			prev_sample = sample; // update global copy	
+		}
+		else // RIGHT CHANNEL
+		{
+			phase_acc += phase_step; // advance the master phase accumulator (once per stereo frame)
+			sample = prev_sample; 	 // for now just want to have mono.
+		}
+		return sample;
 }
 
 
@@ -96,12 +104,32 @@ void TIMER0A_Handler(void) {
 	// draw();
 }
 
-void fillPingBuffer()
+void fillBuffer(uint16_t *buffer, size_t frameCount)
 {
-	return;
+	// Iterate through the entire buffer size
+	for (size_t i = 0; i < frameCount; i++)
+	{
+    uint16_t sample = next_sample(); // next_sample updates current_channel
+    buffer[i] = sample;
+		if (current_channel == 0) // if left channel, push sample to display buffer, update scope idx.
+		{
+			display_buffer[scope_write_index++] = sample; 
+			scope_write_index++;
+			if (scope_write_index >= SCOPE_BUFFER_SIZE)
+			{
+				scope_write_index = 0;
+			}
+		}
+	}
 }
 
-void fillPongBuffer()
+// wrappers, unnecessary, remove later.
+void fillPingBuffer(uint16_t *buffer, size_t frameCount)
 {
-	return;
+	fillBuffer(buffer, frameCount);
+}
+
+void fillPongBuffer(uint16_t *buffer, size_t frameCount)
+{
+	fillBuffer(buffer, frameCount);
 }

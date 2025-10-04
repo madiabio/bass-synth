@@ -74,6 +74,6 @@ void test_display()
 // ************* main function ***********************
 int main(void)
 {
-	test_display();
+	test_I2S_circuit();
 	return 0;
 }

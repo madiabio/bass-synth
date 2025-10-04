@@ -11,6 +11,8 @@
 #define PQ1 (1<<1) // SSI3Fss
 #define PQ2 (1<<2) // SSI3XDAT0 TX
 #define PQ3 (1<<3) // SSI3XDAT1 RX (UNUSED)
+#define IRQ_NUMBER_SSI3 55
+
 
 // SSI2 -> Display
 #define PD0 (1<<0) // SSI2XDAT1 Tx
@@ -31,6 +33,7 @@
 #define DMATXIM (1<<5)  // QSSI Transmit DMA Interrupt Mask
 #define DMATXMIS (1<<5) // QSSI Transmit DMA Masked Interrupt Status
 #define DMATXIC (1<<5)  // QSSI Transmit DMA Interrupt Clear (writing a 1 to this clears DMATXRIS bit in SSIRIS and DMATXMIS in SSIMIS)
+#define TXDMAE  (1<<1) 	// Transmit DMA Enable
 
 void init_SSI1(); // for 12-bit DAC
 void init_SSI3(); // for I2S DAC
