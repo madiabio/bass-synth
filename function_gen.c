@@ -15,7 +15,7 @@
 volatile waveform_t waveform_mode = WAVE_SAW;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
 volatile uint32_t phase_step = 56229845; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
-volatile uint16_t prev_sample = 0; // current global sample
+volatile uint16_t prev_sample = DAC_MID; // current global sample
 static int16_t x_pos = 0;
 static int16_t prev_x = 0;
 static int16_t prev_y = ILI9341_TFTHEIGHT / 2; // start mid-screen
@@ -104,14 +104,14 @@ uint16_t next_sample(void) {
 							break;
 					case WAVE_TRI: {
 							uint16_t saw = phase_acc >> 20;
-							sample = (saw < 2048) ? (saw * 2) : ((4095 - saw) * 2);
+							sample = (saw < 2048) ? (saw * 2) : ((DAC_MAX - saw) * 2);
 							break;
 					}
 					case WAVE_SQUARE:
-							sample = (phase_acc & 0x80000000) ? 4095 : 0;
+							sample = (phase_acc & 0x80000000) ? DAC_MAX : 0;
 							break;
 			}
-			sample = note_on ? next_sample() : DAC_MID;
+			sample = note_on ? sample : DAC_MID;
 			prev_sample = sample; // update global copy	
 		}
 		else // RIGHT CHANNEL
@@ -130,8 +130,11 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
 	// Iterate through the entire buffer size
 	for (size_t i = 0; i < frameCount; i++)
 	{
-    uint16_t sample = next_sample(); // next_sample updates current_channel
-    current_channel ^= 1; 	// switch channel
+    uint16_t sample;
+		if (note_on) sample = next_sample(); // next_sample updates current_channel
+    else sample = DAC_MID;
+		
+		current_channel ^= 1; 	// switch channel
 		buffer[i] = sample; 	// push sample into buffer
 		
 		if (current_channel == 0) // if left channel, push sample to display buffer, update scope idx.

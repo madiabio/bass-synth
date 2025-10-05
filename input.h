@@ -5,9 +5,10 @@
 #include <stdbool.h>
 
 extern volatile uint8_t note_on;      // gate flag
+extern volatile char key_pressed;      // tells which key is being pressed, -1 if none.
+
 
 void init_UART0();
-void UART0_Init();
 // inits UART3
 void init_UART3();
 

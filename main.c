@@ -20,7 +20,7 @@
 uint8_t prev_button_edge  = 1;   // track previous button state
 
 
-void test_I2S_circuit()
+void config_I2S_circuit()
 {
 	init_sine_table();
 	init_dma();
@@ -89,11 +89,11 @@ void test_keypad_with_I2S()
 {
 	keypad_init();
 	// init_timer0a();
-	test_button();
-	test_I2S_circuit();
+	// test_button();
+	config_I2S_circuit();
 	while(true) 
 	{
-		handle_waveform_state();
+		scan_keypad();
 	}  // loop forever
 
 }
@@ -111,14 +111,11 @@ int main(void)
 	
 	init_sine_table(); // lookup table for sine wave
 	keypad_init(); // enable the GPIO pins required for the keypad
-
-
-
 	
-	while (true) {
-			scan_keypad();
+	config_I2S_circuit();
+	while (true)
+	{
+		scan_keypad();
 	}
-	
-	
 	return 0;
 }

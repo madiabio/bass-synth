@@ -90,7 +90,7 @@ void keypad_init(void)
 	GPIOE_AHB->DEN |= PEs;
 }
 
-
+/*
 void scan_keypad()
 {
 	char last_raw = 0;
@@ -134,4 +134,32 @@ void scan_keypad()
 		}
 		ES_msDelay(30);
 	}
+}
+*/
+
+void scan_keypad(void) {
+    static const char keyMap[4][3] = {
+        {'1','2','3'},
+        {'4','5','6'},
+        {'7','8','9'},
+        {'*','0','#'}
+    };
+
+    for (int col = 0; col < 3; col++) {
+        GPIOK->DATA &= ~0x07;          // all low
+        GPIOK->DATA |= (1 << col);     // one high
+        ES_usDelay(50);
+        uint32_t rows = GPIOE_AHB->DATA & 0x0F;
+
+        for (int row = 0; row < 4; row++) {
+            if ((rows >> row) & 1) {
+                key_pressed = keyMap[row][col];
+                note_on = 1;
+                return;  // leave after first press
+            }
+        }
+    }
+    // if no key pressed
+    note_on = 0;
+    key_pressed = -1;
 }
