@@ -28,7 +28,7 @@ void display_keypad();
 // scans the keypad every 30ms
 void scan_keypad();
 
-void init_timer0a(void);
-void TIMER0A_Handler(void);
+// void init_timer0a(void);
+// void TIMER0A_Handler(void);
 
 #endif

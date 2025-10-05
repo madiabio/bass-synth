@@ -8,8 +8,9 @@
 volatile uint8_t note_on = 0;      // gate flag
 
 #define PK3 (1<<3)
-#define PA4 (1<<4)	// U3Rx
-#define PA5 (1<<5) // U3Tx
+#define PK0 (1<<0)
+#define PK1 (1<<1)
+
 #define PA1 (1<<1) // U0
 #define PA0 (1<<0)	// U0
 #define U3  (1<<3)
@@ -39,30 +40,7 @@ void init_UART0()
 
 }
 
-
-void keypad_init(void)
-{	
-	uint32_t GPIOK_and_GPIOE = ((1<<9) | (1<<4));
-	SYSCTL->RCGCGPIO |= GPIOK_and_GPIOE;
-	while ( (SYSCTL->PRGPIO & (GPIOK_and_GPIOE)) == 0 ) {}
-	
-	uint32_t PKs = (1<<1) | (1<<0) | PK3 ;
-	uint32_t PEs = (1<<0) | (1<<3) | (1<<2) | (1<<1);
-		
-	// Set as inputs
-	GPIOK->DIR |= PKs;
-	GPIOE_AHB->DIR &= ~PEs;
-		
-	// enable pull down resistor for switches
-	GPIOK->DR2R |= PKs; // enable pins output to drive 2mA
-	GPIOE_AHB->PDR |= PEs; // Enable pull down resistor
-	
-	// enable digital
-	GPIOK->DEN  |= PKs;
-	GPIOE_AHB->DEN |= PEs;
-}
-
-
+/*
 void init_timer0a() {
     SYSCTL->RCGCTIMER |= (1<<0); // enable timer 0 clock
 		while((SYSCTL->PRTIMER & (1 << 0)) == 0) {}// Wait until ready
@@ -87,6 +65,30 @@ void TIMER0A_Handler(void)
 	TIMER0->ICR = 1; // clear flag
 	note_on = 0; // Clear the gate
 }
+*/
+
+void keypad_init(void)
+{
+	uint32_t GPIOK_and_GPIOE = ((1<<9) | (1<<4));
+	SYSCTL->RCGCGPIO |= GPIOK_and_GPIOE;
+	while ( (SYSCTL->PRGPIO & (GPIOK_and_GPIOE)) == 0 ) {}
+	
+	uint32_t PKs = (1<<1) | (1<<0) | (1<<2);
+	uint32_t PEs = (1<<0) | (1<<3) | (1<<2) | (1<<1);
+		
+	// Set as inputs
+	GPIOK->DIR |= PKs;
+	GPIOE_AHB->DIR &= ~PEs;
+		
+	// enable pull down resistor for switches
+	GPIOK->DR2R |= PKs; // enable pins output to drive 2mA
+	GPIOE_AHB->PDR |= PEs; // Enable pull up resistor
+	
+	// enable digital
+	GPIOK->DEN  |= PKs;
+	GPIOE_AHB->DEN |= PEs;
+}
+
 
 void scan_keypad()
 {
@@ -103,12 +105,12 @@ void scan_keypad()
 
 	while(true)
 	{
-		const uint32_t cols[3] = { (1<<0), (1<<1), PK3 };
-
+		
 		for (int col = 0; col < 3; col++) {
 			// set all cols low and then set current col high.
-			GPIOK->DATA &= ~((1 << 0) | (1 << 1) | PK3);
-			GPIOK->DATA |= cols[col];
+			GPIOK->DATA &= ~((1 << 0) | (1 << 1) | (1 << 2));
+			GPIOK->DATA |= (1 << col);
+			ES_usDelay(100);
 			uint32_t rows = GPIOE_AHB->DATA & 0x0F; // PE0 PE3
 
 
@@ -119,28 +121,9 @@ void scan_keypad()
 				if ((rows >> row) & 0x1) {
 					char key = keyMap[row][col];
 					ES_Uprintf(0, "Key Pressed: %c\n", key);
-					
-					// map '1'..'9' to notes
-					uint8_t note_index = key - '1';  
-					handle_note_input(note_index, true);
-
-					note_on = 1;
-					TIMER0->CTL = 0;                   // stop timer
-					TIMER0->TAILR = NOTE_DURATION_TICKS;
-					TIMER0->ICR = 0x1;
-					TIMER0->CTL |= 0x1;                // start timer
 				}	
 			}
 		}
 		ES_msDelay(30);
 	}
-}
-
-void handle_note_input(uint8_t note_index, bool reset_phase) {
-    if (note_index < CHROMATIC_LEN) {
-        phase_step = chromatic[note_index].step; // get 32 bit phase increment for that note
-        if (reset_phase) {
-            phase_acc = 0;
-        }
-    }
 }
