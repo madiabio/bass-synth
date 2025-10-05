@@ -30,5 +30,9 @@
 // Sine wave settings
 #define TABLE_SIZE 1024 	// number of samples
 #define DAC_MAX    0xFFFF // highest value the DAC can hold
+#define DAC_MID 0x8000  // middle value of the DAC
+
+// Default note duration
+#define NOTE_DURATION_TICKS  1600000  // e.g. 100 ms at 16 MHz
 
 #endif

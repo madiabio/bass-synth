@@ -4,6 +4,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+extern volatile uint8_t note_on;      // gate flag
+
+void init_UART0();
+void UART0_Init();
+// inits UART3
+void init_UART3();
+
 
 // Initalises the GPIO pins required for the keypad
 void keypad_init(void);
@@ -21,5 +28,7 @@ void display_keypad();
 // scans the keypad every 30ms
 void scan_keypad();
 
+void init_timer0a(void);
+void TIMER0A_Handler(void);
 
 #endif

@@ -6,9 +6,8 @@
 #include <stdbool.h>
 
 #include "ES.h"
-
 #include "function_gen.h" // for timer0a_init(), waveform_mode
-#include "input.h" // for handle_note_input(), scan_keypad()
+#include "input.h" // for handle_note_input(), scan_keypad(), init_UART3()
 #include "waveforms.h" // for init_sine_table()
 
 #include "LCD_Display.h"
@@ -16,6 +15,8 @@
 #include "dma.h"
 
 #include "adc.h"
+
+
 uint8_t prev_button_edge  = 1;   // track previous button state
 
 
@@ -83,9 +84,11 @@ void test_display()
 		
 	}  // loop forever
 }
-// ************* main function ***********************
-int main(void)
+
+void test_keypad_with_I2S()
 {
+	keypad_init();
+	init_timer0a();
 	test_button();
 	test_I2S_circuit();
 	while(true) 
@@ -93,5 +96,28 @@ int main(void)
 		handle_waveform_state();
 	}  // loop forever
 
+}
+
+void test_keypad()
+{
+	return;
+}
+
+// ************* main function ***********************
+int main(void)
+{
+	
+	
+	ES_setSystemClk(120000000);
+	init_UART0();
+	uint32_t x = ES_getSystemClk();
+	ES_Serial(0, "115200,8,N,1");     // matches the UART config
+	ES_Uprintf(0, "\n=========\nBR = 115200, 8 bit wlen, no parity, 1 stop bit, \n==========\n");
+	
+	keypad_init();
+	while(true) 
+	{
+	scan_keypad();
+	}
 	return 0;
 }

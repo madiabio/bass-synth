@@ -10,6 +10,7 @@
 #include "i2c.h" // for mcp4275_write()
 #include "SSI.h" // for 
 #include "LCD_Display.h"
+#include "input.h"
 
 volatile waveform_t waveform_mode = WAVE_SAW;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
@@ -87,23 +88,6 @@ void update_LEDs() {
 }
 
 
-void init_timer0a() {
-    SYSCTL->RCGCTIMER |= (1<<0); // enable timer 0 clock
-		while((SYSCTL->PRTIMER & (1 << 0)) == 0) {}// Wait until ready
-
-    TIMER0->CTL &= ~(1<<0); // disable during setup
-    TIMER0->CFG = 0; // 32-bit timer
-    
-		TIMER0->TAMR = 0x2; // periodic down counter mode
-    TIMER0->TAILR = TIMER0A_RELOAD; // load value (defined in config.h)
-    TIMER0->IMR |= (1<<0); // enable timeout interrupt
-    
-		// enable IRQ 19 to enable interrupts on NVIC for TIMER0 (see NVIC Register Descriptions in datasheet and TIMER0 Handler in regref/course notes)
-		NVIC->IPR[19] = PRIORITY_TIMER0A; // set priority as defined in config header
-		NVIC->ISER[0] |= (1<<19); // this is the same thing as NVIC_ENn in the data sheet
-		// TIMER0->CTL = 1;       	// enable timer
-}
-
 uint16_t next_sample(void) {
     uint16_t sample;
 		if (current_channel == 0) // LEFT CHANNEL
@@ -127,6 +111,7 @@ uint16_t next_sample(void) {
 							sample = (phase_acc & 0x80000000) ? 4095 : 0;
 							break;
 			}
+			sample = note_on ? next_sample() : DAC_MID;
 			prev_sample = sample; // update global copy	
 		}
 		else // RIGHT CHANNEL
@@ -134,16 +119,11 @@ uint16_t next_sample(void) {
 			phase_acc += phase_step; // advance the master phase accumulator (once per stereo frame)
 			sample = prev_sample; 	 // for now just want to have mono.
 		}
+		
 		return sample;
 }
 
 
-// Timer0A Handler function as defined in header file
-// Calculates the next value of the waveform
-void TIMER0A_Handler(void) {
-	TIMER0->ICR = 1; // clear flag
-	// draw();
-}
 
 void fillBuffer(uint16_t *buffer, size_t frameCount)
 {
@@ -153,7 +133,7 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
     uint16_t sample = next_sample(); // next_sample updates current_channel
     current_channel ^= 1; 	// switch channel
 		buffer[i] = sample; 	// push sample into buffer
-	
+		
 		if (current_channel == 0) // if left channel, push sample to display buffer, update scope idx.
 		{
 			display_buffer[scope_write_index++] = sample; 
@@ -163,7 +143,7 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
 				scope_write_index = 0;
 			}
 		}
-	
+		
 	
 	}
 }
