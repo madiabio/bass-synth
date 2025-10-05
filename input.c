@@ -6,6 +6,7 @@
 #include <TM4C129.h>
 #include <stdint.h>
 volatile uint8_t note_on = 0;      // gate flag
+volatile char key_pressed = -1;   // current key (-1 if none)
 
 #define PK3 (1<<3)
 #define PK0 (1<<0)
@@ -105,7 +106,7 @@ void scan_keypad()
 
 	while(true)
 	{
-		
+		int mask = 0;
 		for (int col = 0; col < 3; col++) {
 			// set all cols low and then set current col high.
 			GPIOK->DATA &= ~((1 << 0) | (1 << 1) | (1 << 2));
@@ -113,14 +114,21 @@ void scan_keypad()
 			ES_usDelay(100);
 			uint32_t rows = GPIOE_AHB->DATA & 0x0F; // PE0 PE3
 
-
 			// iterate thru each input and check which bit has been set
 			// then reference that to the key map to see which key that
 			// corresponds to.
 			for (int row = 0; row < 4; row++) {
 				if ((rows >> row) & 0x1) {
-					char key = keyMap[row][col];
-					ES_Uprintf(0, "Key Pressed: %c\n", key);
+					key_pressed  = keyMap[row][col];
+					note_on = 1;
+					ES_Uprintf(0, "Key Pressed: %c\n", key_pressed);
+					while ((GPIOE_AHB->DATA & (1<<row)) != 0) {
+							ES_usDelay(1000); // small hold delay
+					}
+					note_on = 0; // clear when released
+					key_pressed = -1;
+					ES_Uprintf(0, "Released\n");
+
 				}	
 			}
 		}
