@@ -8,7 +8,7 @@
 
 
 // Derived timer reload value
-#define KEYPAD_SCAN_PERIOD 120000
+#define KEYPAD_SCAN_PERIOD 250
 #define TIMER0A_RELOAD  ((SYS_CLK_FREQ / KEYPAD_SCAN_PERIOD ) - 1)
 
 // For SSI Configs
@@ -21,9 +21,9 @@
 
 
 // Priorities
-#define PRIORITY_TIMER0A 2 // Function generator interrupt priority
-#define PRIORITY_SSI3 2 // DMA ping pong to SSI3 I2S interrupt priority
-#define PRIORITY_GPIOE 3 // Note check interrupt priority
+#define PRIORITY_TIMER0A 3 // Function generator interrupt priority
+#define PRIORITY_SSI3 1 // DMA ping pong to SSI3 I2S interrupt priority
+#define PRIORITY_GPIOE 4 // Note check interrupt priority
 
 // DMA Ping-Pong Buffer Frame Count
 #define FRAME_COUNT 256

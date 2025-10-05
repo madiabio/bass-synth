@@ -8,7 +8,7 @@
 #include "config.h"
 volatile uint8_t note_on = 0;      // gate flag
 volatile char key_pressed = -1;   // current key (-1 if none)
-volatile uint32_t row_event_flags = 0;
+
 
 #define PK3 (1<<3)
 #define PK0 (1<<0)
@@ -19,6 +19,7 @@ volatile uint32_t row_event_flags = 0;
 #define U3  (1<<3)
 #define U0  (1<<0)
 
+volatile uint32_t e_irq_count = 0;
 
 
 #define IRQ_NUMBER_GPIOE 4
@@ -46,6 +47,7 @@ void init_UART0()
 	
 
 }
+
 void init_timer0a() {
     SYSCTL->RCGCTIMER |= (1<<0); // enable timer 0 clock
 		while((SYSCTL->PRTIMER & (1 << 0)) == 0) {}// Wait until ready
@@ -63,12 +65,14 @@ void init_timer0a() {
 		TIMER0->CTL = 1;       	// enable timer
 }
 
-// Timer0A Handler function as defined in header file
-// Calculates the next value of the waveform
+
+// Timer0A Handler scans the keypad at periodic intervals
 void TIMER0A_Handler(void) 
 {
 	TIMER0->ICR = 0x1;    // clear interrupt flag
+	// ES_Uprintf(0,"interrupt");
 	scan_keypad();        // scan
+
 }
 
 
@@ -91,29 +95,11 @@ void keypad_init(void)
 	// enable digital
 	GPIOK->DEN  |= PKs;
 	GPIOE_AHB->DEN |= PEs;
-		
-	/*
-		
-	// Configure port E rows for interrupts
-	GPIOE_AHB->IM &= ~PEs; // turn off interrupts.
-	
-	GPIOE_AHB->IS &= ~PEs; // set to edge sensitive
-	
-	GPIOE_AHB->IBE |= PEs; // set to both edges triggering an interrupt
-	
-	GPIOE_AHB->ICR |= PEs; // Clear ICR
-	
-	GPIOE_AHB->IM |= PEs; // enable interrupts to NVIC
-	
-	// NVIC FOR GPIOE
-	NVIC->ISER[IRQ_NUMBER_GPIOE / 32] |= (1<<(IRQ_NUMBER_GPIOE %32));
-	NVIC->IPR[IRQ_NUMBER_GPIOE] = PRIORITY_SSI3;
-	*/
 
-	init_timer0a();
+	// enable timer for scanning
 }
 
-/*
+
 void scan_keypad(void) {
     static const char keyMap[4][3] = {
         {'1','2','3'},
@@ -141,7 +127,8 @@ void scan_keypad(void) {
     note_on = 0;
     key_pressed = -1;
 }
-*/
+
+/*
 void scan_keypad()
 {
 	char last_raw = 0;
@@ -172,7 +159,7 @@ void scan_keypad()
 				if ((rows >> row) & 0x1) {
 					key_pressed  = keyMap[row][col];
 					note_on = 1;
-					ES_Uprintf(0, "Key Pressed: %c\n", key_pressed);
+					ES_Uprintf(0, "Key Pressed: %c; count: %i\n", key_pressed, e_irq_count);
 					while ((GPIOE_AHB->DATA & (1<<row)) != 0) {
 							ES_usDelay(1000); // small hold delay
 					}
@@ -186,4 +173,4 @@ void scan_keypad()
 		ES_msDelay(30);
 	}
 }
-
+*/

@@ -32,7 +32,9 @@ void handle_note_input(uint8_t note_index, bool reset_phase);
 void display_keypad();
 
 // scans the keypad every 30ms
+void init_timer0a();
 void scan_keypad();
+
 
 // void init_timer0a(void);
 // void TIMER0A_Handler(void);
