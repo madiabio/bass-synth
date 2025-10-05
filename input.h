@@ -4,9 +4,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define PKs (1<<1) | (1<<0) | (1<<2)	 // cols 
+#define PEs (1<<0) | (1<<3) | (1<<2) | (1<<1) // ROWS
+
 extern volatile uint8_t note_on;      // gate flag
 extern volatile char key_pressed;      // tells which key is being pressed, -1 if none.
-
+extern volatile uint32_t row_event_flags;	// Tells if an event has occurred in a row
 
 void init_UART0();
 // inits UART3
@@ -18,6 +21,8 @@ void keypad_init(void);
 
 // Polls the keypad for inputs
 uint32_t get_keypad_input(void);
+
+
 
 // handle a new note index (from keypad, UART, etc.)
 // reset phase will make the waveform restart cleanly @ the beginning of its cycle every time you press a new note

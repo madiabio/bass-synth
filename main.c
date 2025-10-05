@@ -103,19 +103,26 @@ void test_keypad_with_I2S()
 // ************* main function ***********************
 int main(void)
 {
-	
+	__enable_irq();
 	ES_setSystemClk(120000000);
 	init_UART0();
 	ES_Serial(0, "115200,8,N,1");     // matches the UART config
 	ES_Uprintf(0, "\n=========\nBR = 115200, 8 bit wlen, no parity, 1 stop bit, \n==========\n");
-	
 	init_sine_table(); // lookup table for sine wave
+	// config_I2S_circuit();
 	keypad_init(); // enable the GPIO pins required for the keypad
-	
-	config_I2S_circuit();
 	while (true)
 	{
+		// ES_Uprintf(0,"%02X\n", GPIOE_AHB->DATA);
+    // ES_msDelay(100);
+		/*
 		scan_keypad();
+		if (row_event_flags)
+		{
+			scan_keypad();
+			row_event_flags = 0;
+		}
+		*/
 	}
 	return 0;
 }

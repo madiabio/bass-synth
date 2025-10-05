@@ -5,6 +5,7 @@
 #include "config.h" // for priorities
 #include "function_gen.h" // for next_sample();
 #include "dma.h"
+#include "input.h"
 
 void init_SSI1() // for the 12 bit DAC
 {
@@ -75,8 +76,6 @@ void spi_Transmit(uint8_t data) {
 }
 
 
-
-
 void init_SSI3() // for I2S
 {
 	SYSCTL->RCGCGPIO |= (1 << 14);
@@ -116,6 +115,7 @@ void init_SSI3() // for I2S
 
 void SSI3_Handler(void)
 {
+	
 	if (SSI3->MIS & DMATXMIS) {
 		
 		// 1. Disable TXDMAE before clearing interrupt

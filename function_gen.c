@@ -12,7 +12,7 @@
 #include "LCD_Display.h"
 #include "input.h"
 
-volatile waveform_t waveform_mode = WAVE_SAW;  // default to saw
+volatile waveform_t waveform_mode = WAVE_SINE;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
 volatile uint32_t phase_step = 56229845; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
 volatile uint16_t prev_sample = DAC_MID; // current global sample
@@ -116,7 +116,8 @@ uint16_t next_sample(void) {
 		}
 		else // RIGHT CHANNEL
 		{
-			phase_acc += phase_step; // advance the master phase accumulator (once per stereo frame)
+			// advance the master phase accumulator (once per stereo frame)
+			if (note_on) phase_acc += phase_step; // only advance when note is active
 			sample = prev_sample; 	 // for now just want to have mono.
 		}
 		
@@ -131,9 +132,8 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
 	for (size_t i = 0; i < frameCount; i++)
 	{
     uint16_t sample;
-		if (note_on) sample = next_sample(); // next_sample updates current_channel
-    else sample = DAC_MID;
-		
+		sample = next_sample(); // next_sample updates current_channel
+    
 		current_channel ^= 1; 	// switch channel
 		buffer[i] = sample; 	// push sample into buffer
 		

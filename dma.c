@@ -3,6 +3,8 @@
 #include <TM4C129.h>
 #include "config.h"
 #include "function_gen.h"
+
+
 #define CH15_MASK_CLEAR 0x0FFFFFFF
 #define CH15_SHIFT 28
 
