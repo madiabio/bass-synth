@@ -1,7 +1,7 @@
 Dependencies for Project 'embedded-assignment', Target 'Target 1': (DO NOT MODIFY !)
 CompilerVersion: 6230000::V6.23::ARMCLANG
 F (.\config.h)(0x68E28AE5)()
-F (.\main.c)(0x68E35C13)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/_Target_1-IC:/Users/madel/AppData/Local/Arm/Packs/ARM/CMSIS/6.2.0/CMSIS/Core/Include-IC:/Users/madel/AppData/Local/Arm/Packs/Keil/TM4C_DFP/1.1.0/Device/Include/TM4C129-D__UVISION_VERSION="542" -DTM4C1294NCPDT -D_RTE_-o ./objects/main.o -MMD)
+F (.\main.c)(0x68E360C3)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/_Target_1-IC:/Users/madel/AppData/Local/Arm/Packs/ARM/CMSIS/6.2.0/CMSIS/Core/Include-IC:/Users/madel/AppData/Local/Arm/Packs/Keil/TM4C_DFP/1.1.0/Device/Include/TM4C129-D__UVISION_VERSION="542" -DTM4C1294NCPDT -D_RTE_-o ./objects/main.o -MMD)
 I (C:\Users\madel\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129\TM4C129.h)(0x687DDE5B)
 I (C:\Users\madel\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129\TM4C1294NCPDT.h)(0x687DDE5B)
 I (C:\Users\madel\AppData\Local\Arm\Packs\ARM\CMSIS\6.2.0\CMSIS\Core\Include\core_cm4.h)(0x687DE0D4)
@@ -14,9 +14,10 @@ I (waveforms.h)(0x68E3558D)
 I (LCD_Display.h)(0x68DCEDD2)
 I (SSI.h)(0x68E0F6A3)
 I (dma.h)(0x68E13143)
+I (notes.h)(0x68E36A86)
 I (adc.h)(0x68E12100)
 F (.\function_gen.h)(0x68E35576)()
-F (.\function_gen.c)(0x68E35B9A)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/_Target_1-IC:/Users/madel/AppData/Local/Arm/Packs/ARM/CMSIS/6.2.0/CMSIS/Core/Include-IC:/Users/madel/AppData/Local/Arm/Packs/Keil/TM4C_DFP/1.1.0/Device/Include/TM4C129-D__UVISION_VERSION="542" -DTM4C1294NCPDT -D_RTE_-o ./objects/function_gen.o -MMD)
+F (.\function_gen.c)(0x68E35F1C)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/_Target_1-IC:/Users/madel/AppData/Local/Arm/Packs/ARM/CMSIS/6.2.0/CMSIS/Core/Include-IC:/Users/madel/AppData/Local/Arm/Packs/Keil/TM4C_DFP/1.1.0/Device/Include/TM4C129-D__UVISION_VERSION="542" -DTM4C1294NCPDT -D_RTE_-o ./objects/function_gen.o -MMD)
 I (C:\Users\madel\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129\TM4C129.h)(0x687DDE5B)
 I (C:\Users\madel\AppData\Local\Arm\Packs\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129\TM4C1294NCPDT.h)(0x687DDE5B)
 I (C:\Users\madel\AppData\Local\Arm\Packs\ARM\CMSIS\6.2.0\CMSIS\Core\Include\core_cm4.h)(0x687DE0D4)
@@ -25,21 +26,21 @@ I (ES_Lib.h)(0x68AC0B8C)
 I (function_gen.h)(0x68E35576)
 I (config.h)(0x68E28AE5)
 I (waveforms.h)(0x68E3558D)
-I (notes.h)(0x68D348A6)
+I (notes.h)(0x68E36A86)
 I (i2c.h)(0x68DC995D)
 I (SSI.h)(0x68E0F6A3)
 I (LCD_Display.h)(0x68DCEDD2)
 I (input.h)(0x68E289FE)
-F (.\notes.h)(0x68D348A6)()
-F (.\notes.c)(0x68E0C8AE)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/_Target_1-IC:/Users/madel/AppData/Local/Arm/Packs/ARM/CMSIS/6.2.0/CMSIS/Core/Include-IC:/Users/madel/AppData/Local/Arm/Packs/Keil/TM4C_DFP/1.1.0/Device/Include/TM4C129-D__UVISION_VERSION="542" -DTM4C1294NCPDT -D_RTE_-o ./objects/notes.o -MMD)
-I (notes.h)(0x68D348A6)
+F (.\notes.h)(0x68E36A86)()
+F (.\notes.c)(0x68E361FD)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/_Target_1-IC:/Users/madel/AppData/Local/Arm/Packs/ARM/CMSIS/6.2.0/CMSIS/Core/Include-IC:/Users/madel/AppData/Local/Arm/Packs/Keil/TM4C_DFP/1.1.0/Device/Include/TM4C129-D__UVISION_VERSION="542" -DTM4C1294NCPDT -D_RTE_-o ./objects/notes.o -MMD)
+I (notes.h)(0x68E36A86)
 F (.\waveforms.h)(0x68E3558D)()
 F (.\waveforms.c)(0x68E12028)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/_Target_1-IC:/Users/madel/AppData/Local/Arm/Packs/ARM/CMSIS/6.2.0/CMSIS/Core/Include-IC:/Users/madel/AppData/Local/Arm/Packs/Keil/TM4C_DFP/1.1.0/Device/Include/TM4C129-D__UVISION_VERSION="542" -DTM4C1294NCPDT -D_RTE_-o ./objects/waveforms.o -MMD)
 I (waveforms.h)(0x68E3558D)
 I (config.h)(0x68E28AE5)
 F (.\input.h)(0x68E289FE)()
-F (.\input.c)(0x68E35C28)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/_Target_1-IC:/Users/madel/AppData/Local/Arm/Packs/ARM/CMSIS/6.2.0/CMSIS/Core/Include-IC:/Users/madel/AppData/Local/Arm/Packs/Keil/TM4C_DFP/1.1.0/Device/Include/TM4C129-D__UVISION_VERSION="542" -DTM4C1294NCPDT -D_RTE_-o ./objects/input.o -MMD)
-I (notes.h)(0x68D348A6)
+F (.\input.c)(0x68E3602A)(-xc -std=c11 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-D__EVAL -gdwarf-4 -O0 -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -Wno-reserved-identifier-I./RTE/_Target_1-IC:/Users/madel/AppData/Local/Arm/Packs/ARM/CMSIS/6.2.0/CMSIS/Core/Include-IC:/Users/madel/AppData/Local/Arm/Packs/Keil/TM4C_DFP/1.1.0/Device/Include/TM4C129-D__UVISION_VERSION="542" -DTM4C1294NCPDT -D_RTE_-o ./objects/input.o -MMD)
+I (notes.h)(0x68E36A86)
 I (function_gen.h)(0x68E35576)
 I (config.h)(0x68E28AE5)
 I (input.h)(0x68E289FE)

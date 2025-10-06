@@ -1,5 +1,6 @@
 #include "notes.h"
-
+#include "math.h"
+/*
 const NoteEntry chromatic[] = {
     {"C2", 14046108}, {"C#2/Db2", 14854813}, {"D2", 15766007},
     {"D#2/Eb2", 16784281}, {"E2", 17696745}, {"F2", 18724013},
@@ -11,6 +12,20 @@ const NoteEntry chromatic[] = {
     {"A3", 47244640}, {"A#3/Bb3", 50186148}, {"B3", 53052984},
     {"C4", 56229845}
 };
+*/
+NoteEntry chromatic[CHROMATIC_LEN];
+const char *noteNames[] = {
+    "C2","C#2","D2","D#2","E2","F2","F#2","G2","G#2","A2","A#2","B2",
+    "C3","C#3","D3","D#3","E3","F3","F#3","G3","G#3","A3","A#3","B3"
+};
+
+void init_chromatic_table(void) {
+    for (int i = 0; i < CHROMATIC_LEN; i++) {
+        float freq = BASE_FREQ * powf(2.0f, i / 12.0f);
+        chromatic[i].name = noteNames[i];
+        chromatic[i].step = (uint32_t)((freq * TWO32) / SAMPLE_RATE);
+    }
+}
 
 // intervals in semitones from root
 const int major_offsets[7]     = {0, 2, 4, 5, 7, 9, 11};

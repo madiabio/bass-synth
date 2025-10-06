@@ -118,12 +118,26 @@ void scan_keypad(void) {
 								ES_Uprintf(0, "Key Pressed: %c\n", key_pressed);
                 note_on = 1;
 							
-								// map key to note index in chromatic[]
-                
-								uint8_t note_index = key_pressed - '0';
-                if (note_index < CHROMATIC_LEN) {
-                    handle_note_input(note_index, true);
+								// map key to note index 
+                uint8_t note_index;
+                switch (key_pressed) {
+                    case '1': note_index = 0; break;   // C
+                    case '2': note_index = 1; break;   // C#
+                    case '3': note_index = 2; break;   // D
+                    case '4': note_index = 3; break;   // D#
+                    case '5': note_index = 4; break;   // E
+                    case '6': note_index = 5; break;   // F
+                    case '7': note_index = 6; break;   // F#
+                    case '8': note_index = 7; break;   // G
+                    case '9': note_index = 8; break;   // G#
+                    case '*': note_index = 9; break;   // A
+                    case '0': note_index = 10; break;  // A#
+                    case '#': note_index = 11; break;  // B
+                    default: return;
                 }
+
+                handle_note_input(note_index, true);
+                ES_Uprintf(0, "Note: %s\n", chromatic[note_index].name);
                 return;  // leave after first press
             }
         }

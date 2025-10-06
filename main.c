@@ -14,6 +14,7 @@
 #include "SSI.h" // for initSPI(), init_SSI0()
 #include "dma.h"
 
+#include "notes.h"
 #include "adc.h"
 
 
@@ -91,7 +92,7 @@ int main(void)
 	ES_Serial(0, "115200,8,N,1");     // matches the UART config
 	ES_Uprintf(0, "\n=========\nBR = 115200, 8 bit wlen, no parity, 1 stop bit, \n==========\n");
 	init_sine_table(); // lookup table for sine wave
-	
+	init_chromatic_table(); // chromatic notes
 	config_I2S_circuit();
 	keypad_init();
 	test_button();

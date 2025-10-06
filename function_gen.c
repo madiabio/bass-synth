@@ -12,9 +12,9 @@
 #include "LCD_Display.h"
 #include "input.h"
 
-volatile waveform_t waveform_mode = WAVE_SINE;  // default to saw
+volatile waveform_t waveform_mode = WAVE_TRI;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
-volatile uint32_t phase_step = 56229845; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
+volatile uint32_t phase_step = 0; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
 volatile uint16_t prev_sample = DAC_MID; // current global sample
 static int16_t x_pos = 0;
 static int16_t prev_x = 0;
