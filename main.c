@@ -20,7 +20,7 @@
 
 void config_I2S_circuit()
 {
-	init_sine_table();
+	init_wave_tables();
 	init_dma();
 	init_SSI3();
 }
@@ -84,21 +84,46 @@ void test_keypad_with_I2S()
 
 // ************* main function ***********************
 int main(void)
-{
+{	
+	
 	__enable_irq();
 	ES_setSystemClk(120000000);
+	
+	// Display
+	initSPI();
+	initLCD();
+	setRotation(2);
+	clearScreen();
+	
+	// Printing to terminal
 	init_UART0();
 	ES_Serial(0, "115200,8,N,1");     // matches the UART config
 	ES_Uprintf(0, "\n=========\nBR = 115200, 8 bit wlen, no parity, 1 stop bit, \n==========\n");
-	init_sine_table(); // lookup table for sine wave
-	init_chromatic_table(); // chromatic notes
+	
+	// Synth notes
+	init_wave_tables(); // lookup table for waves
+	init_chromatic_table(); // calculate the chromatic notes
+	
+	// DAC
 	config_I2S_circuit();
+	
+	// Input
 	keypad_init();
 	test_button();
 	init_timer0a();
-	while(true) {
-		// handle_waveform_state();
-		// ES_usDelay(1000);  // 1 ms delay between polls
-	}
+	int display_skip = 0;
+	
+	while(true) 
+	{
+		if (scope_ready)
+		{
+		}
+		if (scan_ready)
+		{
+			scan_ready = 0;
+			// scan_keypad(); // look for keypad presses
+			// handle_waveform_state(); // update waveform according to waveform select
+		}
+	}	
 	return 0;
 }

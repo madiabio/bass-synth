@@ -9,8 +9,8 @@
 
 extern volatile uint8_t note_on;      // gate flag
 extern volatile char key_pressed;      // tells which key is being pressed, -1 if none.
-extern volatile uint32_t row_event_flags;	// Tells if an event has occurred in a row
 
+extern volatile int scan_ready; // flag to tell to do scan
 void init_UART0();
 // inits UART3
 void init_UART3();

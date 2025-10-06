@@ -8,8 +8,7 @@
 #include "config.h"
 volatile uint8_t note_on = 0;      // gate flag
 volatile char key_pressed = -1;   // current key (-1 if none)
-
-
+volatile int scan_ready = 0;
 #define PK3 (1<<3)
 #define PK0 (1<<0)
 #define PK1 (1<<1)
@@ -41,8 +40,6 @@ void init_UART0()
 	UART0->LCRH = (0x3 << 5);       // 8-bit, no parity, 1 stop
 	UART0->CC   = 0;              // use sysclk
 	UART0->CTL  = (1 << 9) | (1 << 8) | (1 << 0); // RXE, TXE, UEN
-	
-
 }
 
 void init_timer0a() {
@@ -68,7 +65,8 @@ void init_timer0a() {
 void TIMER0A_Handler(void) 
 {
 	TIMER0->ICR = 0x1;    // clear interrupt flag
-	// ES_Uprintf(0,"interrupt");
+	scan_ready = 1;
+	
 	scan_keypad();        // scan
 	handle_waveform_state(); // update waveform
 }

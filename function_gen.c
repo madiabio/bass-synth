@@ -12,25 +12,29 @@
 #include "LCD_Display.h"
 #include "input.h"
 
-#define MIDLINE  (ILI9341_TFTHEIGHT / 2)   // 160 for a 320-pixel-tall display
-#define SCALE  (ILI9341_TFTHEIGHT / 65536.0f)
-
+// for waveform state
 volatile waveform_t waveform_mode = WAVE_TRI;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
 volatile uint32_t phase_step = 0; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
 volatile uint16_t prev_sample = DAC_MID; // current global sample
+
+// for waveform select button
+#define STABLE_COUNT 5  // number of consecutive samples required (˜5ms if timer = 1ms)
+uint8_t prev_button_edge  = 1;   // track previous button state
+
+volatile int current_channel = 0; // 0 = Left, 1 = Right
+
+// for drawing
+#define MIDLINE  (ILI9341_TFTHEIGHT / 2)   // 160 for a 320-pixel-tall display
+#define SCALE  (ILI9341_TFTHEIGHT / 65536.0f)
 static int16_t x_pos = 0;
 static int16_t prev_x = 0;
 static int16_t prev_y = ILI9341_TFTHEIGHT / 2; // start mid-screen
 
-volatile int current_channel = 0; // 0 = Left, 1 = Right
+// for drawing buffer
 volatile size_t scope_write_index = 0;
 uint16_t display_buffer[SCOPE_BUFFER_SIZE];
-
-// for waveform state
-#define STABLE_COUNT 5  // number of consecutive samples required (˜5ms if timer = 1ms)
-uint8_t prev_button_edge  = 1;   // track previous button state
-
+volatile int scope_ready = 0;
 
 // for waveform select LED MSB
 void init_PG1()
@@ -135,26 +139,16 @@ void handle_note_input(uint8_t note_index, bool reset_phase) {
 
 uint16_t next_sample(void) {
     uint16_t sample;
+		uint16_t idx = PHASE_TO_INDEX(phase_acc, TABLE_SIZE);
+
 		if (current_channel == 0) // LEFT CHANNEL
 		{
 			
 			switch (waveform_mode) {
-					case WAVE_SINE: {
-							uint16_t idx = PHASE_TO_INDEX(phase_acc, TABLE_SIZE);
-							sample = sine_table[idx];
-							break;
-					}
-					case WAVE_SAW:
-							sample = phase_acc >> 20;
-							break;
-					case WAVE_TRI: {
-							uint16_t saw = phase_acc >> 20;
-							sample = (saw < 2048) ? (saw * 2) : ((DAC_MAX - saw) * 2);
-							break;
-					}
-					case WAVE_SQUARE:
-							sample = (phase_acc & 0x80000000) ? DAC_MAX : 0;
-							break;
+					case WAVE_SINE:   sample = sine_table[idx]; break;
+					case WAVE_SAW:    sample = saw_table[idx];  break;
+					case WAVE_TRI:    sample = tri_table[idx];  break;
+					case WAVE_SQUARE: sample = sqr_table[idx];  break;
 			}
 			sample = note_on ? sample : DAC_MID;
 			prev_sample = sample; // update global copy	
@@ -171,17 +165,15 @@ uint16_t next_sample(void) {
 
 void drawWaveform(void)
 {
-    clearScreen();
-    int16_t prev_y = MIDLINE;
-    int16_t step = ILI9341_TFTWIDTH / SCOPE_BUFFER_SIZE;
-    
-    for (int i = 0; i < SCOPE_BUFFER_SIZE && i < ILI9341_TFTWIDTH; i++) {
-        int16_t y = MIDLINE - (int16_t)((display_buffer[i] - 32768) * SCALE);
-        drawPixel(i, y, 0xFFFF);
-        // Optionally connect lines for smoother trace
-        // drawLine(prev_x, prev_y, i, y, 0xFFFF);
-        prev_x = i;
-        prev_y = y;
+
+    int16_t mid = ILI9341_TFTHEIGHT / 2;
+    float scale = (ILI9341_TFTHEIGHT / 65536.0f);
+    float x_step = (float)ILI9341_TFTWIDTH / SCOPE_BUFFER_SIZE;  // horizontal scale
+
+    for (int i = 0; i < SCOPE_BUFFER_SIZE; i++) {
+        int16_t y = mid - (int16_t)((display_buffer[i] - DAC_MID) * scale);
+        int16_t x = (int16_t)(i * x_step);
+        drawPixel(x, y, 0xFFFF);
     }
 }
 
@@ -204,9 +196,9 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
 			{
 				scope_write_index = 0;
 			}
-		}
-		
-	
+			if (scope_write_index == 0)
+					scope_ready = 1;
+			}
 	}
 }
 
