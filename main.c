@@ -84,23 +84,15 @@ void test_keypad_with_I2S()
 // ************* main function ***********************
 int main(void)
 {
-	/*
-	init_sine_table(); // lookup table for sine wave
-	test_button();
-	config_I2S_circuit();
-	keypad_init(); // enable the GPIO pins required for the keypad
-	init_timer0a();
-	while (true)
-	{
-		handle_waveform_state();
-	}
-	*/
+
 	__enable_irq();
 	ES_setSystemClk(120000000);
 	init_UART0();
 	ES_Serial(0, "115200,8,N,1");     // matches the UART config
 	ES_Uprintf(0, "\n=========\nBR = 115200, 8 bit wlen, no parity, 1 stop bit, \n==========\n");
-
+	init_sine_table(); // lookup table for sine wave
+	
+	config_I2S_circuit();
 	keypad_init();
 	test_button();
 	init_timer0a();
