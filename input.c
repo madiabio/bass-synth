@@ -135,6 +135,7 @@ void scan_keypad(void) {
                 }
 
                 handle_note_input(note_index, true);
+
                 ES_Uprintf(0, "Note: %s\n", chromatic[note_index].name);
                 return;  // leave after first press
             }

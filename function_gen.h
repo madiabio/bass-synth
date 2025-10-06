@@ -41,6 +41,7 @@ void fillPongBuffer(uint16_t *buffer, size_t frameCount);
 extern uint16_t display_buffer[SCOPE_BUFFER_SIZE];
 extern volatile size_t scope_write_index;
 extern volatile int scope_ready;
+extern volatile uint8_t waveform_changed;
 
 void drawWaveform();
 

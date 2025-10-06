@@ -21,6 +21,7 @@ volatile uint16_t prev_sample = DAC_MID; // current global sample
 // for waveform select button
 #define STABLE_COUNT 5  // number of consecutive samples required (˜5ms if timer = 1ms)
 uint8_t prev_button_edge  = 1;   // track previous button state
+volatile uint8_t waveform_changed = 0;
 
 volatile int current_channel = 0; // 0 = Left, 1 = Right
 
@@ -124,6 +125,8 @@ void handle_waveform_state(void) {
         if (stable_state == 0) {
             waveform_mode = (waveform_t)((waveform_mode + 1) & 0x3);
             update_LEDs();
+						waveform_changed = 1;
+
         }
     }
 }
@@ -163,18 +166,14 @@ uint16_t next_sample(void) {
 		return sample;
 }
 
+static uint16_t scope_index = 0;
 void drawWaveform(void)
 {
-
-    int16_t mid = ILI9341_TFTHEIGHT / 2;
-    float scale = (ILI9341_TFTHEIGHT / 65536.0f);
-    float x_step = (float)ILI9341_TFTWIDTH / SCOPE_BUFFER_SIZE;  // horizontal scale
-
-    for (int i = 0; i < SCOPE_BUFFER_SIZE; i++) {
-        int16_t y = mid - (int16_t)((display_buffer[i] - DAC_MID) * scale);
-        int16_t x = (int16_t)(i * x_step);
-        drawPixel(x, y, 0xFFFF);
-    }
+	for (int i = 0; i < ILI9341_TFTWIDTH; i += 4) {  // skip 3 of every 4 pixels
+			int j = (i * SCOPE_BUFFER_SIZE) / ILI9341_TFTWIDTH;
+			int16_t y = MIDLINE - ((display_buffer[j] - DAC_MID) * SCALE);
+			drawPixel(i, y, 0xFFFF);
+	}
 }
 
 

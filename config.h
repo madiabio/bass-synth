@@ -16,13 +16,14 @@
 #define SSI1_SCR (245 << 8) // Extra
 #define SSI3_SCR (38 << 8)	// I2S DAC
 #define SSI3_CPSR 2					// I2S DAC
-#define SSI2_CPSR 10 				// LCD Display
-#define SSI2_SCR (5<<8) 		// LCD Display
+
+#define SSI2_CPSR 2 				// LCD Display
+#define SSI2_SCR (0<<8) 		// LCD Display
 
 
 // Priorities
 #define PRIORITY_TIMER0A 3 // Function generator interrupt priority
-#define PRIORITY_SSI3 1 // DMA ping pong to SSI3 I2S interrupt priority
+#define PRIORITY_SSI3 0 // DMA ping pong to SSI3 I2S interrupt priority
 #define PRIORITY_GPIOE 4 // Note check interrupt priority
 
 // DMA Ping-Pong Buffer Frame Count

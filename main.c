@@ -94,7 +94,7 @@ int main(void)
 	initLCD();
 	setRotation(2);
 	clearScreen();
-	
+	drawWaveform();
 	// Printing to terminal
 	init_UART0();
 	ES_Serial(0, "115200,8,N,1");     // matches the UART config
@@ -106,17 +106,29 @@ int main(void)
 	
 	// DAC
 	config_I2S_circuit();
-	
+
 	// Input
 	keypad_init();
 	test_button();
 	init_timer0a();
-	int display_skip = 0;
+	static uint8_t skip = 0;
 	
+	int prev = 0;
 	while(true) 
 	{
-		if (scope_ready)
+		if (waveform_changed)
 		{
+			if (prev == 0)
+			{
+				fillScreen(0xF800);   // red
+				prev = 1;
+			}
+			else
+			{
+				fillScreen(0x001F);   // blue
+				prev = 0;
+			}
+			waveform_changed = 0;
 		}
 		if (scan_ready)
 		{
