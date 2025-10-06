@@ -17,9 +17,6 @@
 #include "adc.h"
 
 
-uint8_t prev_button_edge  = 1;   // track previous button state
-
-
 void config_I2S_circuit()
 {
 	init_sine_table();
@@ -32,21 +29,6 @@ void test_button()
     init_button_PD7();
     init_PG1();
 		init_PK4();
-
-
-}
-
-void handle_waveform_state()
-{
-	uint8_t now = (GPIOD_AHB->DATA & PD7) ? 1 : 0;
-
-	if(prev_button_edge == 1 && now == 0) {   // detect falling edge (press)
-		waveform_mode = (waveform_t)((waveform_mode + 1) & 0x3);
-		update_LEDs();
-		for(volatile int i=0; i<50000; i++); // crude debounce ~5–10ms
-	}
-	prev_button_edge  = now;
-
 }
 
 void test_SSI1()
@@ -60,7 +42,6 @@ void test_SSI1()
 		while (SSI1->SR & (1 << 4)) {
     // wait until BSY = 0
 		}
-
 	}  // loop forever
 
 }
@@ -103,17 +84,29 @@ void test_keypad_with_I2S()
 // ************* main function ***********************
 int main(void)
 {
-	__enable_irq();
-	ES_setSystemClk(120000000);
-	init_UART0();
-	ES_Serial(0, "115200,8,N,1");     // matches the UART config
-	ES_Uprintf(0, "\n=========\nBR = 115200, 8 bit wlen, no parity, 1 stop bit, \n==========\n");
+	/*
 	init_sine_table(); // lookup table for sine wave
+	test_button();
 	config_I2S_circuit();
 	keypad_init(); // enable the GPIO pins required for the keypad
 	init_timer0a();
 	while (true)
 	{
+		handle_waveform_state();
+	}
+	*/
+	__enable_irq();
+	ES_setSystemClk(120000000);
+	init_UART0();
+	ES_Serial(0, "115200,8,N,1");     // matches the UART config
+	ES_Uprintf(0, "\n=========\nBR = 115200, 8 bit wlen, no parity, 1 stop bit, \n==========\n");
+
+	keypad_init();
+	test_button();
+	init_timer0a();
+	while(true) {
+		handle_waveform_state();
+		// ES_usDelay(1000);  // 1 ms delay between polls
 	}
 	return 0;
 }

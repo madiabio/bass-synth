@@ -22,6 +22,9 @@ typedef enum {
     WAVE_SQUARE
 } waveform_t;
 
+void handle_waveform_state(); // updates the state based off button presses
+
+
 // Used for generating next sample
 extern volatile waveform_t waveform_mode;
 extern volatile uint32_t phase_acc;
@@ -47,7 +50,6 @@ void draw();
 // only need 256 = 2^8, therefore only need 8 bits of the phase accumulator to walk thru the table.
 // phase_acci s a 32 bit int, therefore, extract the top 8 bits by shifting right. 32 - 8 = 24.
 #define PHASE_TO_INDEX(acc, tbl_size) ((acc) >> (32 - __builtin_ctz(tbl_size)))
-
 
 
 void init_PG1();  // waveform select LED0

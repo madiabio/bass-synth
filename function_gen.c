@@ -24,6 +24,11 @@ volatile int current_channel = 0; // 0 = Left, 1 = Right
 volatile size_t scope_write_index = 0;
 uint16_t display_buffer[SCOPE_BUFFER_SIZE];
 
+// for waveform state
+#define STABLE_COUNT 5  // number of consecutive samples required (˜5ms if timer = 1ms)
+uint8_t prev_button_edge  = 1;   // track previous button state
+
+
 // for testing
 void init_PG1()
 {
@@ -68,6 +73,7 @@ void init_button_PD7()
 	GPIOD_AHB->LOCK = 0;  // re-lock GPIO port
 }
 
+
 void update_LEDs() {
     uint32_t bits = 0;
 
@@ -85,6 +91,34 @@ void update_LEDs() {
     // Then set according to bits
     if(bits & 0b10) GPIOG_AHB->DATA |= PG1; // MSB
     if(bits & 0b01) GPIOK->DATA     |= PK4; // LSB
+}
+
+void handle_waveform_state(void) {
+    static uint8_t stable_state = 1;   // 1 = released
+    static uint8_t last_sample = 1;
+    static uint8_t count = 0;
+
+    uint8_t now = (GPIOD_AHB->DATA & PD7) ? 1 : 0;
+
+    // wait until input is stable for N samples
+    if (now == last_sample) {
+        if (count < STABLE_COUNT) count++;
+    } else {
+        count = 0;
+    }
+    last_sample = now;
+
+    // update only when stable and changed
+    if (count >= STABLE_COUNT && stable_state != now) {
+        stable_state = now;
+        count = 0;
+
+        // trigger only on falling edge (press)
+        if (stable_state == 0) {
+            waveform_mode = (waveform_t)((waveform_mode + 1) & 0x3);
+            update_LEDs();
+        }
+    }
 }
 
 

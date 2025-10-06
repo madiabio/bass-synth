@@ -66,13 +66,14 @@ void init_timer0a() {
 }
 
 
+
 // Timer0A Handler scans the keypad at periodic intervals
 void TIMER0A_Handler(void) 
 {
 	TIMER0->ICR = 0x1;    // clear interrupt flag
 	// ES_Uprintf(0,"interrupt");
 	scan_keypad();        // scan
-
+	handle_waveform_state(); // update waveform
 }
 
 
@@ -117,7 +118,7 @@ void scan_keypad(void) {
         for (int row = 0; row < 4; row++) {
             if ((rows >> row) & 1) {
                 key_pressed = keyMap[row][col];
-								// ES_Uprintf(0, "Key Pressed: %c\n", key_pressed);
+								ES_Uprintf(0, "Key Pressed: %c\n", key_pressed);
                 note_on = 1;
                 return;  // leave after first press
             }
