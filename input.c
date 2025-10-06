@@ -19,9 +19,6 @@ volatile char key_pressed = -1;   // current key (-1 if none)
 #define U3  (1<<3)
 #define U0  (1<<0)
 
-volatile uint32_t e_irq_count = 0;
-
-
 #define IRQ_NUMBER_GPIOE 4
 
 void init_UART0()
@@ -120,6 +117,13 @@ void scan_keypad(void) {
                 key_pressed = keyMap[row][col];
 								ES_Uprintf(0, "Key Pressed: %c\n", key_pressed);
                 note_on = 1;
+							
+								// map key to note index in chromatic[]
+                
+								uint8_t note_index = key_pressed - '0';
+                if (note_index < CHROMATIC_LEN) {
+                    handle_note_input(note_index, true);
+                }
                 return;  // leave after first press
             }
         }

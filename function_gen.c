@@ -29,7 +29,7 @@ uint16_t display_buffer[SCOPE_BUFFER_SIZE];
 uint8_t prev_button_edge  = 1;   // track previous button state
 
 
-// for testing
+// for waveform select LED MSB
 void init_PG1()
 {
 	SYSCTL->RCGCGPIO |= (1<<6);
@@ -40,7 +40,7 @@ void init_PG1()
 	GPIOG_AHB->DATA &= ~PG1 ; // clear data reg
 }
 
-// for testing
+// for waveform select LED LSB
 void init_PK4()
 {
 	SYSCTL->RCGCGPIO |= (1<<9);
@@ -121,6 +121,14 @@ void handle_waveform_state(void) {
     }
 }
 
+void handle_note_input(uint8_t note_index, bool reset_phase) {
+    if (note_index < CHROMATIC_LEN) {
+        phase_step = chromatic[note_index].step; // frequency control word
+        if (reset_phase) {
+            phase_acc = 0; // restart waveform at zero phase
+        }
+    }
+}
 
 uint16_t next_sample(void) {
     uint16_t sample;
