@@ -17,7 +17,7 @@
 #include "notes.h"
 #include "adc.h"
 
-
+#include <math.h>
 void config_I2S_circuit()
 {
 	init_wave_tables();
@@ -82,6 +82,59 @@ void test_keypad_with_I2S()
 
 
 
+void showWaveformName(void)
+{
+    clearScreen();
+    const uint16_t textColor = 0xFFFF;
+    const uint16_t bgColor   = 0x0000;
+
+    // screen constants
+    const int16_t screenW = 240;
+    const int16_t screenH = 320;
+
+    // bottom band 40 px tall, placed about 20 px above very bottom
+    int16_t bandY = screenH - 60;   // start of band (60 px from top edge)
+    int16_t bandH = 40;
+
+    // clear that band
+    fillRect(0, bandY, screenW, bandH, bgColor);
+
+    // text position (centered roughly)
+    setCharConfig(textColor, 2, 1, bgColor, 1);
+
+    switch (waveform_mode) {
+
+        case WAVE_SINE:
+            for (int x = 20; x < 220; x += 2) {             // more samples (denser)
+                int16_t y = bandY + 25 - (int16_t)(15 * sinf((x - 20) * 0.12f));
+                fillRect(x, y, 2, 2, textColor);
+            }
+            break;
+
+        case WAVE_SAW:
+            for (int x = 40; x < 200; x += 8) {
+                int y = bandY + 30 - ((x - 40) / 8);
+                fillRect(x, y, 2, 2, 0x07E0);
+            }
+            break;
+
+        case WAVE_TRI:
+            for (int x = 40; x < 120; x++)
+                fillRect(x, bandY + 30 - (x - 40) / 4, 1, 1, 0x001F);
+            for (int x = 120; x < 200; x++)
+                fillRect(x, bandY + 10 + (x - 120) / 4, 1, 1, 0x001F);
+            break;
+
+        case WAVE_SQUARE:
+            fillRect(70,  bandY + 12, 60, 2, 0xF800);  // top
+            fillRect(70,  bandY + 12, 2, 16, 0xF800);  // left
+            fillRect(128, bandY + 12, 2, 16, 0xF800);  // right
+            fillRect(70,  bandY + 26, 60, 2, 0xF800);  // bottom
+            break;
+    }
+}
+
+
 // ************* main function ***********************
 int main(void)
 {	
@@ -94,7 +147,7 @@ int main(void)
 	initLCD();
 	setRotation(2);
 	clearScreen();
-	drawWaveform();
+	
 	// Printing to terminal
 	init_UART0();
 	ES_Serial(0, "115200,8,N,1");     // matches the UART config
@@ -120,12 +173,13 @@ int main(void)
 		{
 			if (prev == 0)
 			{
-				fillScreen(0xF800);   // red
+				showWaveformName();
 				prev = 1;
 			}
 			else
 			{
-				fillScreen(0x001F);   // blue
+				showWaveformName();
+				// fillScreen(0x001F);   // blue
 				prev = 0;
 			}
 			waveform_changed = 0;

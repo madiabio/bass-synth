@@ -43,7 +43,6 @@ extern volatile size_t scope_write_index;
 extern volatile int scope_ready;
 extern volatile uint8_t waveform_changed;
 
-void drawWaveform();
 
 // Convert 32-bit phase accumulator to a table index
 // tbl_size must be a power of two (e.g. 256, 1024, 4096)

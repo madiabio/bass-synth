@@ -167,15 +167,26 @@ uint16_t next_sample(void) {
 }
 
 static uint16_t scope_index = 0;
+
 void drawWaveform(void)
 {
-	for (int i = 0; i < ILI9341_TFTWIDTH; i += 4) {  // skip 3 of every 4 pixels
-			int j = (i * SCOPE_BUFFER_SIZE) / ILI9341_TFTWIDTH;
-			int16_t y = MIDLINE - ((display_buffer[j] - DAC_MID) * SCALE);
-			drawPixel(i, y, 0xFFFF);
-	}
-}
+    int16_t mid   = ILI9341_TFTHEIGHT / 2;
+    float scale   = (ILI9341_TFTHEIGHT / 65536.0f);
+    float x_step  = (float)ILI9341_TFTWIDTH / SCOPE_BUFFER_SIZE;
 
+    uint16_t color = 0xFFFF; // white
+    uint16_t bg    = 0x0000; // black
+
+    clearScreen();  // or fillScreen(bg);
+
+    for (int i = 0; i < ILI9341_TFTWIDTH; i++) {
+        int idx = (i * SCOPE_BUFFER_SIZE) / ILI9341_TFTWIDTH;
+        int16_t y = mid - (int16_t)((display_buffer[idx] - DAC_MID) * scale);
+
+        // 2-pixel vertical trace for visibility
+        fillRect(i, y-1, 1, 2, color);
+    }
+}
 
 void fillBuffer(uint16_t *buffer, size_t frameCount)
 {
