@@ -24,6 +24,8 @@ void init_wave_tables(void) {
         // triangle
         tri_table[i] = (uint16_t)((t < 0.5f ? t * 2.0f : (1.0f - t) * 2.0f) * DAC_MAX);
         // square
-        sqr_table[i] = (i < TABLE_SIZE / 2) ? DAC_MAX : 0;
+				sqr_table[i] = (i < TABLE_SIZE / 2)
+						? (DAC_MID + DAC_MID / 2)
+						: (DAC_MID - DAC_MID / 2);
     }
 }
