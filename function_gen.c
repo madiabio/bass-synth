@@ -12,6 +12,9 @@
 #include "LCD_Display.h"
 #include "input.h"
 
+#define MIDLINE  (ILI9341_TFTHEIGHT / 2)   // 160 for a 320-pixel-tall display
+#define SCALE  (ILI9341_TFTHEIGHT / 65536.0f)
+
 volatile waveform_t waveform_mode = WAVE_TRI;  // default to saw
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
 volatile uint32_t phase_step = 0; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
@@ -166,6 +169,21 @@ uint16_t next_sample(void) {
 		return sample;
 }
 
+void drawWaveform(void)
+{
+    clearScreen();
+    int16_t prev_y = MIDLINE;
+    int16_t step = ILI9341_TFTWIDTH / SCOPE_BUFFER_SIZE;
+    
+    for (int i = 0; i < SCOPE_BUFFER_SIZE && i < ILI9341_TFTWIDTH; i++) {
+        int16_t y = MIDLINE - (int16_t)((display_buffer[i] - 32768) * SCALE);
+        drawPixel(i, y, 0xFFFF);
+        // Optionally connect lines for smoother trace
+        // drawLine(prev_x, prev_y, i, y, 0xFFFF);
+        prev_x = i;
+        prev_y = y;
+    }
+}
 
 
 void fillBuffer(uint16_t *buffer, size_t frameCount)
@@ -182,7 +200,6 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
 		if (current_channel == 0) // if left channel, push sample to display buffer, update scope idx.
 		{
 			display_buffer[scope_write_index++] = sample; 
-			scope_write_index++;
 			if (scope_write_index >= SCOPE_BUFFER_SIZE)
 			{
 				scope_write_index = 0;

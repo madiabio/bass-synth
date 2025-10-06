@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Template.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Template.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Mon Oct  6 17:06:53 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Mon Oct  6 17:23:54 2025
 <BR><P>
 <H3>Maximum Stack Usage =        628 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -2140,7 +2140,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[113]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_dma
 </UL>
 
-<P><STRONG><a name="[116]"></a>fillBuffer</STRONG> (Thumb, 142 bytes, Stack size 24 bytes, function_gen.o(.text.fillBuffer))
+<P><STRONG><a name="[116]"></a>fillBuffer</STRONG> (Thumb, 136 bytes, Stack size 24 bytes, function_gen.o(.text.fillBuffer))
 <BR><BR>[Stack]<UL><LI>Max Depth = 44<LI>Call Chain = fillBuffer &rArr; next_sample
 </UL>
 <BR>[Calls]<UL><LI><a href="#[117]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;next_sample
@@ -2179,7 +2179,6 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;update_LEDs
 </UL>
 <BR>[Called By]<UL><LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIMER0A_Handler
-<LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[123]"></a>init_PG1</STRONG> (Thumb, 88 bytes, Stack size 0 bytes, function_gen.o(.text.init_PG1))
@@ -2240,12 +2239,11 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[bf]"></a>main</STRONG> (Thumb, 88 bytes, Stack size 16 bytes, main.o(.text.main))
+<P><STRONG><a name="[bf]"></a>main</STRONG> (Thumb, 84 bytes, Stack size 16 bytes, main.o(.text.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 628 + Unknown Stack Size
 <LI>Call Chain = main &rArr; ES_Serial &rArr; sscanf &rArr; __vfscanf_char &rArr; __vfscanf &rArr; _scanf_real &rArr; _scanf_really_real &rArr; _fp_value &rArr; _btod_etento &rArr; _btod_emul &rArr; _e2e
 </UL>
-<BR>[Calls]<UL><LI><a href="#[110]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;handle_waveform_state
-<LI><a href="#[120]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_timer0a
+<BR>[Calls]<UL><LI><a href="#[120]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_timer0a
 <LI><a href="#[119]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_chromatic_table
 <LI><a href="#[105]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_Uprintf
 <LI><a href="#[102]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_Serial

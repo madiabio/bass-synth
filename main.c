@@ -85,7 +85,6 @@ void test_keypad_with_I2S()
 // ************* main function ***********************
 int main(void)
 {
-
 	__enable_irq();
 	ES_setSystemClk(120000000);
 	init_UART0();
@@ -98,7 +97,7 @@ int main(void)
 	test_button();
 	init_timer0a();
 	while(true) {
-		handle_waveform_state();
+		// handle_waveform_state();
 		// ES_usDelay(1000);  // 1 ms delay between polls
 	}
 	return 0;
