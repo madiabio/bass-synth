@@ -1,4 +1,3 @@
-// Generates the sawtooth waveform necessary
 #include <TM4C129.h>
 #include <stdlib.h>
 #include <stdint.h>

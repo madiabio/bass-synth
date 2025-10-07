@@ -1,9 +1,7 @@
 // Workshop 2 Template
 // Remember to start and configure TeraTerm
 #include <TM4C129.h>
-#include <stdlib.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 #include "ES.h"
 #include "function_gen.h" // for timer0a_init(), waveform_mode
@@ -17,7 +15,6 @@
 #include "adc.h"
 #include "display_utils.h"
 
-#include <math.h>
 void config_I2S_circuit()
 {
 	init_wave_tables();
@@ -85,17 +82,17 @@ int main(void)
 {	
 	
 	__enable_irq();
-	ES_setSystemClk(120000000);
+	ES_setSystemClk(SYS_CLK_FREQ);
 	
 	// ADC
 	init_adc();
 
 	// Display
-	
 	initSPI();
 	initLCD();
 	setRotation(2);
 	clearScreen();
+	drawWaveformSample();
 	
 	// Printing to terminal
 	init_UART0();

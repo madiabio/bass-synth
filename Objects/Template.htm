@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Template.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Template.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Tue Oct  7 18:35:14 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Wed Oct  8 01:01:58 2025
 <BR><P>
 <H3>Maximum Stack Usage =        636 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -1540,8 +1540,8 @@ Global Symbols
 <P><STRONG><a name="[11f]"></a>strlen</STRONG> (Thumb, 62 bytes, Stack size 8 bytes, strlen.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = strlen
 </UL>
-<BR>[Called By]<UL><LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;drawWaveformSample
-<LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;displayADCValues
+<BR>[Called By]<UL><LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;displayADCValues
+<LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;drawWaveformSample
 </UL>
 
 <P><STRONG><a name="[18c]"></a>__use_two_region_memory</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, heapauxi.o(.text), UNUSED)
@@ -2209,11 +2209,11 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[122]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;drawChar
 <LI><a href="#[11c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fillRect
 </UL>
-<BR>[Called By]<UL><LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;drawWaveformSample
-<LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;displayADCValues
+<BR>[Called By]<UL><LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;displayADCValues
+<LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;drawWaveformSample
 </UL>
 
-<P><STRONG><a name="[126]"></a>drawWaveformSample</STRONG> (Thumb, 426 bytes, Stack size 56 bytes, display_utils.o(.text.drawWaveformSample))
+<P><STRONG><a name="[126]"></a>drawWaveformSample</STRONG> (Thumb, 424 bytes, Stack size 56 bytes, display_utils.o(.text.drawWaveformSample))
 <BR><BR>[Stack]<UL><LI>Max Depth = 172<LI>Call Chain = drawWaveformSample &rArr; drawString &rArr; drawChar &rArr; fillRect &rArr; setAddrWindow &rArr; writecommand &rArr; spi_Transmit
 </UL>
 <BR>[Calls]<UL><LI><a href="#[11e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;moveCursor
@@ -2369,17 +2369,17 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[c0]"></a>main</STRONG> (Thumb, 146 bytes, Stack size 24 bytes, main.o(.text.main))
+<P><STRONG><a name="[c0]"></a>main</STRONG> (Thumb, 150 bytes, Stack size 24 bytes, main.o(.text.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 636 + Unknown Stack Size
 <LI>Call Chain = main &rArr; ES_Serial &rArr; sscanf &rArr; __vfscanf_char &rArr; __vfscanf &rArr; _scanf_real &rArr; _scanf_really_real &rArr; _fp_value &rArr; _btod_etento &rArr; _btod_emul &rArr; _e2e
 </UL>
-<BR>[Calls]<UL><LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;drawWaveformSample
-<LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;displayADCValues
+<BR>[Calls]<UL><LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;displayADCValues
 <LI><a href="#[137]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_timer0a
 <LI><a href="#[12d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_chromatic_table
 <LI><a href="#[107]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_Uprintf
 <LI><a href="#[104]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_Serial
 <LI><a href="#[134]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_UART0
+<LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;drawWaveformSample
 <LI><a href="#[131]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_adc
 <LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_setSystemClk
 <LI><a href="#[135]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;keypad_init
@@ -2397,8 +2397,8 @@ Global Symbols
 <P><STRONG><a name="[11e]"></a>moveCursor</STRONG> (Thumb, 76 bytes, Stack size 4 bytes, ili9341.o(.text.moveCursor))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = moveCursor
 </UL>
-<BR>[Called By]<UL><LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;drawWaveformSample
-<LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;displayADCValues
+<BR>[Called By]<UL><LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;displayADCValues
+<LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;drawWaveformSample
 </UL>
 
 <P><STRONG><a name="[128]"></a>next_sample</STRONG> (Thumb, 268 bytes, Stack size 24 bytes, function_gen.o(.text.next_sample))
@@ -2431,8 +2431,8 @@ Global Symbols
 <P><STRONG><a name="[11d]"></a>setCharConfig</STRONG> (Thumb, 70 bytes, Stack size 16 bytes, ili9341.o(.text.setCharConfig))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = setCharConfig
 </UL>
-<BR>[Called By]<UL><LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;drawWaveformSample
-<LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;displayADCValues
+<BR>[Called By]<UL><LI><a href="#[11b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;displayADCValues
+<LI><a href="#[126]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;drawWaveformSample
 </UL>
 
 <P><STRONG><a name="[133]"></a>setRotation</STRONG> (Thumb, 204 bytes, Stack size 16 bytes, ili9341.o(.text.setRotation))
