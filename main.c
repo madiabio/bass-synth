@@ -135,6 +135,54 @@ void showWaveformName(void)
 }
 
 
+void drawWaveformSample(void)
+{
+    clearScreen();
+
+    int centerY = ILI9341_TFTHEIGHT / 2;
+    int startX  = 20;
+    int width   = 200;
+    float scaleY = 50.0f;
+		uint16_t color = COLOR_SINE;
+
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        float normalized = 0.0f;
+        float x = startX + (float)i / TABLE_SIZE * width;
+
+        switch (waveform_mode) {
+            case WAVE_SINE:
+								normalized = (sine_table[i] / 65535.0f) * 2.0f - 1.0f; // -1 to +1							
+								color = COLOR_SINE;
+                break;
+
+            case WAVE_SAW:
+                normalized = ((float)i / TABLE_SIZE) * 2.0f - 1.0f;
+								color = COLOR_SAW;
+                break;
+
+            case WAVE_TRI:
+                if (i < TABLE_SIZE / 2)
+                    normalized = (4.0f * i / TABLE_SIZE) - 1.0f;
+                else
+                    normalized = 3.0f - (4.0f * i / TABLE_SIZE);
+								color = COLOR_TRI;
+                break;
+
+            case WAVE_SQUARE:
+                normalized = (i < TABLE_SIZE / 2) ? 1.0f : -1.0f;
+								color = COLOR_SQUARE;    
+								break;
+
+            default:
+                normalized = 0;
+                break;
+        }
+
+        int y = centerY - (int)(normalized * scaleY);
+				drawPixel((int)x, y, color);
+    }
+}
+
 // ************* main function ***********************
 int main(void)
 {	
@@ -191,13 +239,13 @@ int main(void)
 		{
 			if (prev == 0)
 			{
-				showWaveformName();
+				drawWaveformSample();
 				prev = 1;
 				
 			}
 			else
 			{
-				showWaveformName();
+				drawWaveformSample();
 				prev = 0;
 			}
 			waveform_changed = 0;

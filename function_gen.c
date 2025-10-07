@@ -13,7 +13,7 @@
 #include "input.h"
 
 // for waveform state
-volatile waveform_t waveform_mode = WAVE_TRI;  // default to saw
+volatile waveform_t waveform_mode = WAVE_SINE; 
 volatile uint32_t phase_acc = 0; // holds current phase of the waveform
 volatile uint32_t phase_step = 0; // controls how much phase_acc advances each sample (determines output frequency) (starts at middle C)
 volatile uint16_t prev_sample = DAC_MID; // current global sample

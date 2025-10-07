@@ -31,9 +31,15 @@
 #define FRAME_COUNT 256
 #define SCOPE_BUFFER_SIZE  320 // ring scope buffer for display (mono)
 
-// Sine wave settings
+// Wave table settings
 #define TABLE_SIZE 4096 	// number of samples
 #define DAC_MAX    0xFFFF // highest value the DAC can hold
 #define DAC_MID 0x8000  // middle value of the DAC
+
+// Display settings
+#define COLOR_SINE      0x07E0  // green
+#define COLOR_SAW       0xF800  // red
+#define COLOR_TRI  0x001F  // blue
+#define COLOR_SQUARE    0xFFE0  // yellow
 
 #endif
