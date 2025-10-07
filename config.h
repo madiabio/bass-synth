@@ -32,7 +32,7 @@
 #define SCOPE_BUFFER_SIZE  320 // ring scope buffer for display (mono)
 
 // Sine wave settings
-#define TABLE_SIZE 2048 	// number of samples
+#define TABLE_SIZE 4096 	// number of samples
 #define DAC_MAX    0xFFFF // highest value the DAC can hold
 #define DAC_MID 0x8000  // middle value of the DAC
 

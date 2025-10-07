@@ -5,8 +5,11 @@
 
 #define CHROMATIC_LEN 25   // number of notes defined (might change)
 #define SAMPLE_RATE 48000.0f
-#define BASE_FREQ 65.406f   // C2
+// #define BASE_FREQ 32.703f   // C1  (one octave below C2)
+
+// #define BASE_FREQ 65.406f   // C2
 // #define BASE_FREQ 261.63f   // C4
+#define BASE_FREQ 523.251 // C5
 #define TWO32 4294967296.0f // 2^32
 
 typedef struct {
