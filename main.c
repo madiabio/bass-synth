@@ -193,6 +193,27 @@ void drawWaveformSample(void)
     drawString((char*)label, strlen(label));
 
 }
+void displayADCValues(uint16_t ain7, uint16_t ain6, uint16_t ain8)
+{
+    char buf[32];
+
+    // draw background rectangle on right side (to overwrite old text)
+    fillRect(180, 40, 60, 80, 0x0000); // x,y,w,h,black
+
+    setCharConfig(0xFFFF, 1, 1, 0x0000, 1); // white text
+    moveCursor(185, 50);
+
+    snprintf(buf, sizeof(buf), "A7:%4u", ain7);
+    drawString(buf, strlen(buf));
+
+    moveCursor(185, 70);
+    snprintf(buf, sizeof(buf), "A6:%4u", ain6);
+    drawString(buf, strlen(buf));
+
+    moveCursor(185, 90);
+    snprintf(buf, sizeof(buf), "A8:%4u", ain8);
+    drawString(buf, strlen(buf));
+}
 
 // ************* main function ***********************
 int main(void)
@@ -202,7 +223,7 @@ int main(void)
 	ES_setSystemClk(120000000);
 	
 	// ADC
-	//init_adc();
+	init_adc();
 
 	// Display
 	
@@ -233,7 +254,7 @@ int main(void)
 	int prev = 0;
 	while(true) 
 	{
-		/*
+		
 		ADC0->PSSI |= (1 << 0);   // start conversion on sequencer 0
 		while ((ADC0->RIS & (1 << 0)) == 0) { }  // wait for SS0 complete
 		
@@ -244,7 +265,7 @@ int main(void)
 		ADC0->ISC = (1 << 0);  // clear SS0 interrupt
 		
 		// ES_Uprintf(0, "AIN7=%u AIN6=%u AIN8=%u\n", ain7, ain6, ain8);
-		*/
+		displayADCValues(ain7, ain6, ain8);        
 		
 		if (waveform_changed)
 		{
