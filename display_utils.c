@@ -71,7 +71,7 @@ void displayADCValues()
     setCharConfig(0xFFFF, 1, 1, 0x0000, 1); // white text
     moveCursor(185, 50);
 
-    snprintf(buf, sizeof(buf), "A7:%4u", Attack_ms);
+    snprintf(buf, sizeof(buf), "Attack:%4u", Attack_ms);
     drawString(buf, strlen(buf));
 
     moveCursor(185, 70);
