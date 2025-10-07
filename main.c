@@ -142,7 +142,11 @@ int main(void)
 	__enable_irq();
 	ES_setSystemClk(120000000);
 	
+	// ADC
+	//init_adc();
+
 	// Display
+	
 	initSPI();
 	initLCD();
 	setRotation(2);
@@ -166,20 +170,34 @@ int main(void)
 	init_timer0a();
 	static uint8_t skip = 0;
 	
+	
 	int prev = 0;
 	while(true) 
 	{
+		/*
+		ADC0->PSSI |= (1 << 0);   // start conversion on sequencer 0
+		while ((ADC0->RIS & (1 << 0)) == 0) { }  // wait for SS0 complete
+		
+		uint16_t ain7 = ADC0->SSFIFO0 & 0xFFF;
+		uint16_t ain6 = ADC0->SSFIFO0 & 0xFFF;
+		uint16_t ain8 = ADC0->SSFIFO0 & 0xFFF;
+	
+		ADC0->ISC = (1 << 0);  // clear SS0 interrupt
+		
+		// ES_Uprintf(0, "AIN7=%u AIN6=%u AIN8=%u\n", ain7, ain6, ain8);
+		*/
+		
 		if (waveform_changed)
 		{
 			if (prev == 0)
 			{
 				showWaveformName();
 				prev = 1;
+				
 			}
 			else
 			{
 				showWaveformName();
-				// fillScreen(0x001F);   // blue
 				prev = 0;
 			}
 			waveform_changed = 0;
@@ -190,6 +208,8 @@ int main(void)
 			// scan_keypad(); // look for keypad presses
 			// handle_waveform_state(); // update waveform according to waveform select
 		}
+		
 	}	
+	
 	return 0;
 }

@@ -153,6 +153,11 @@ uint16_t next_sample(void) {
 					case WAVE_TRI:    sample = tri_table[idx];  break;
 					case WAVE_SQUARE: sample = sqr_table[idx];  break;
 			}
+			// === scale and recenter before sending to DAC ===
+			int32_t s = (int32_t)sample - 32768;
+			s = (s * 26214) >> 15;      // *0.8
+			sample = (uint16_t)(s + 32768);
+			
 			sample = note_on ? sample : DAC_MID;
 			prev_sample = sample; // update global copy	
 		}
@@ -162,6 +167,8 @@ uint16_t next_sample(void) {
 			if (note_on) phase_acc += phase_step; // only advance when note is active
 			sample = prev_sample; 	 // for now just want to have mono.
 		}
+
+
 		
 		return sample;
 }

@@ -51,12 +51,15 @@ void init_timer0a() {
     
 		TIMER0->TAMR = 0x2; // periodic mode
     TIMER0->TAILR = TIMER0A_RELOAD; // load value (defined in config.h)
-    TIMER0->IMR |= (1<<0); // enable timeout interrupt
+    
+		
+	
+		TIMER0->IMR |= (1<<0); // enable timeout interrupt
     
 		// enable IRQ 19 to enable interrupts on NVIC for TIMER0 (see NVIC Register Descriptions in datasheet and TIMER0 Handler in regref/course notes)
 		NVIC->IPR[19] = PRIORITY_TIMER0A; // set priority as defined in config header
 		NVIC->ISER[0] |= (1<<19); // this is the same thing as NVIC_ENn in the data sheet
-		TIMER0->CTL = 1;       	// enable timer
+		TIMER0->CTL |= (1<<0) | (1 << 5); // enable Timer A output trigger for ADC and re-enable TAEN
 }
 
 
@@ -113,7 +116,7 @@ void scan_keypad(void) {
         for (int row = 0; row < 4; row++) {
             if ((rows >> row) & 1) {
                 key_pressed = keyMap[row][col];
-								ES_Uprintf(0, "Key Pressed: %c\n", key_pressed);
+								// ES_Uprintf(0, "Key Pressed: %c\n", key_pressed);
                 note_on = 1;
 							
 								// map key to note index 
@@ -136,7 +139,7 @@ void scan_keypad(void) {
 
                 handle_note_input(note_index, true);
 
-                ES_Uprintf(0, "Note: %s\n", chromatic[note_index].name);
+                // ES_Uprintf(0, "Note: %s\n", chromatic[note_index].name);
                 return;  // leave after first press
             }
         }

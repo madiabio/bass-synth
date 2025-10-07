@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\Template.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\Template.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Mon Oct  6 20:58:05 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Tue Oct  7 16:22:47 2025
 <BR><P>
 <H3>Maximum Stack Usage =        636 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -2057,7 +2057,6 @@ Global Symbols
 <LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;vsprintf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-<LI><a href="#[10f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;scan_keypad
 </UL>
 
 <P><STRONG><a name="[103]"></a>ES_getSystemClk</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, sysclock.o(.text.ES_getSystemClk))
@@ -2102,7 +2101,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[41]"></a>SSI3_Handler</STRONG> (Thumb, 208 bytes, Stack size 16 bytes, ssi.o(.text.SSI3_Handler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = SSI3_Handler &rArr; fillPongBuffer &rArr; fillBuffer &rArr; next_sample
+<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = SSI3_Handler &rArr; fillPongBuffer &rArr; fillBuffer &rArr; next_sample
 </UL>
 <BR>[Calls]<UL><LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fillPongBuffer
 <LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fillPingBuffer
@@ -2113,8 +2112,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup_tm4c129.o(.text)
 </UL>
 <P><STRONG><a name="[1d]"></a>TIMER0A_Handler</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, input.o(.text.TIMER0A_Handler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 328 + Unknown Stack Size
-<LI>Call Chain = TIMER0A_Handler &rArr; scan_keypad &rArr; ES_Uprintf &rArr; vsprintf &rArr; _printf_char_common &rArr; __printf
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = TIMER0A_Handler &rArr; scan_keypad &rArr; ES_usDelay
 </UL>
 <BR>[Calls]<UL><LI><a href="#[110]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;handle_waveform_state
 <LI><a href="#[10f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;scan_keypad
@@ -2131,7 +2129,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[113]"></a>config_I2S_circuit</STRONG> (Thumb, 16 bytes, Stack size 8 bytes, main.o(.text.config_I2S_circuit))
-<BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = config_I2S_circuit &rArr; init_dma &rArr; dma_configure_ssi3_tx &rArr; fillPongBuffer &rArr; fillBuffer &rArr; next_sample
+<BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = config_I2S_circuit &rArr; init_dma &rArr; dma_configure_ssi3_tx &rArr; fillPongBuffer &rArr; fillBuffer &rArr; next_sample
 </UL>
 <BR>[Calls]<UL><LI><a href="#[116]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_SSI3
 <LI><a href="#[115]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_dma
@@ -2141,7 +2139,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[117]"></a>dma_configure_ssi3_tx</STRONG> (Thumb, 200 bytes, Stack size 16 bytes, dma.o(.text.dma_configure_ssi3_tx))
-<BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = dma_configure_ssi3_tx &rArr; fillPongBuffer &rArr; fillBuffer &rArr; next_sample
+<BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = dma_configure_ssi3_tx &rArr; fillPongBuffer &rArr; fillBuffer &rArr; next_sample
 </UL>
 <BR>[Calls]<UL><LI><a href="#[10e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fillPongBuffer
 <LI><a href="#[10d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fillPingBuffer
@@ -2150,7 +2148,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[118]"></a>fillBuffer</STRONG> (Thumb, 164 bytes, Stack size 24 bytes, function_gen.o(.text.fillBuffer))
-<BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = fillBuffer &rArr; next_sample
+<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = fillBuffer &rArr; next_sample
 </UL>
 <BR>[Calls]<UL><LI><a href="#[119]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;next_sample
 </UL>
@@ -2159,7 +2157,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[10d]"></a>fillPingBuffer</STRONG> (Thumb, 20 bytes, Stack size 16 bytes, function_gen.o(.text.fillPingBuffer))
-<BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = fillPingBuffer &rArr; fillBuffer &rArr; next_sample
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = fillPingBuffer &rArr; fillBuffer &rArr; next_sample
 </UL>
 <BR>[Calls]<UL><LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fillBuffer
 </UL>
@@ -2168,7 +2166,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[10e]"></a>fillPongBuffer</STRONG> (Thumb, 20 bytes, Stack size 16 bytes, function_gen.o(.text.fillPongBuffer))
-<BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = fillPongBuffer &rArr; fillBuffer &rArr; next_sample
+<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = fillPongBuffer &rArr; fillBuffer &rArr; next_sample
 </UL>
 <BR>[Calls]<UL><LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fillBuffer
 </UL>
@@ -2251,14 +2249,14 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[115]"></a>init_dma</STRONG> (Thumb, 78 bytes, Stack size 8 bytes, dma.o(.text.init_dma))
-<BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = init_dma &rArr; dma_configure_ssi3_tx &rArr; fillPongBuffer &rArr; fillBuffer &rArr; next_sample
+<BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = init_dma &rArr; dma_configure_ssi3_tx &rArr; fillPongBuffer &rArr; fillBuffer &rArr; next_sample
 </UL>
 <BR>[Calls]<UL><LI><a href="#[117]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;dma_configure_ssi3_tx
 </UL>
 <BR>[Called By]<UL><LI><a href="#[113]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;config_I2S_circuit
 </UL>
 
-<P><STRONG><a name="[12a]"></a>init_timer0a</STRONG> (Thumb, 134 bytes, Stack size 0 bytes, input.o(.text.init_timer0a))
+<P><STRONG><a name="[12a]"></a>init_timer0a</STRONG> (Thumb, 138 bytes, Stack size 0 bytes, input.o(.text.init_timer0a))
 <BR><BR>[Called By]<UL><LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -2303,19 +2301,17 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
-<P><STRONG><a name="[119]"></a>next_sample</STRONG> (Thumb, 266 bytes, Stack size 12 bytes, function_gen.o(.text.next_sample))
-<BR><BR>[Stack]<UL><LI>Max Depth = 12<LI>Call Chain = next_sample
+<P><STRONG><a name="[119]"></a>next_sample</STRONG> (Thumb, 298 bytes, Stack size 16 bytes, function_gen.o(.text.next_sample))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = next_sample
 </UL>
 <BR>[Called By]<UL><LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fillBuffer
 </UL>
 
-<P><STRONG><a name="[10f]"></a>scan_keypad</STRONG> (Thumb, 398 bytes, Stack size 32 bytes, input.o(.text.scan_keypad))
-<BR><BR>[Stack]<UL><LI>Max Depth = 320 + Unknown Stack Size
-<LI>Call Chain = scan_keypad &rArr; ES_Uprintf &rArr; vsprintf &rArr; _printf_char_common &rArr; __printf
+<P><STRONG><a name="[10f]"></a>scan_keypad</STRONG> (Thumb, 348 bytes, Stack size 32 bytes, input.o(.text.scan_keypad))
+<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = scan_keypad &rArr; ES_usDelay
 </UL>
 <BR>[Calls]<UL><LI><a href="#[10c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_usDelay
 <LI><a href="#[12c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;handle_note_input
-<LI><a href="#[105]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ES_Uprintf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[1d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TIMER0A_Handler
 </UL>

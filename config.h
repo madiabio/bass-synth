@@ -14,6 +14,7 @@
 // For SSI Configs
 #define SSI1_CPSR 254				// Extra
 #define SSI1_SCR (245 << 8) // Extra
+
 #define SSI3_SCR (38 << 8)	// I2S DAC
 #define SSI3_CPSR 2					// I2S DAC
 
@@ -24,7 +25,7 @@
 // Priorities
 #define PRIORITY_TIMER0A 3 // Function generator interrupt priority
 #define PRIORITY_SSI3 0 // DMA ping pong to SSI3 I2S interrupt priority
-#define PRIORITY_GPIOE 4 // Note check interrupt priority
+#define PRIORITY_ADC0 3 // Note check interrupt priority
 
 // DMA Ping-Pong Buffer Frame Count
 #define FRAME_COUNT 256
@@ -34,8 +35,5 @@
 #define TABLE_SIZE 2048 	// number of samples
 #define DAC_MAX    0xFFFF // highest value the DAC can hold
 #define DAC_MID 0x8000  // middle value of the DAC
-
-// Default note duration
-#define NOTE_DURATION_TICKS  1600000  // e.g. 100 ms at 16 MHz
 
 #endif
