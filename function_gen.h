@@ -32,17 +32,14 @@ extern volatile uint32_t phase_step;
 extern volatile uint16_t current_sample;
 extern volatile int current_channel; // 0 = Left, 1 = Right
 uint16_t next_sample(void);
+void envelope_updateParams(void);
 
 // Used for DMA to send sample to SSI3 for I2S DAC output
 void fillPingBuffer(uint16_t *buffer, size_t frameCount);
 void fillPongBuffer(uint16_t *buffer, size_t frameCount);
 
-// Used for displaying mono waveform
-extern uint16_t display_buffer[SCOPE_BUFFER_SIZE];
-extern volatile size_t scope_write_index;
-extern volatile int scope_ready;
+// Used for displaying waveform
 extern volatile uint8_t waveform_changed;
-
 
 // Convert 32-bit phase accumulator to a table index
 // tbl_size must be a power of two (e.g. 256, 1024, 4096)

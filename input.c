@@ -5,6 +5,7 @@
 #include <TM4C129.h>
 #include <stdint.h>
 #include "config.h"
+#include "display_utils.h"
 volatile uint8_t note_on = 0;      // gate flag
 volatile char key_pressed = -1;   // current key (-1 if none)
 volatile int scan_ready = 0;
@@ -18,7 +19,7 @@ volatile int scan_ready = 0;
 #define U0  (1<<0)
 
 #define IRQ_NUMBER_GPIOE 4
-
+#include "adc.h"
 void init_UART0()
 {
 	SYSCTL->RCGCUART |= U0;   
@@ -67,10 +68,20 @@ void init_timer0a() {
 void TIMER0A_Handler(void) 
 {
 	TIMER0->ICR = 0x1;    // clear interrupt flag
-	scan_ready = 1;
-	
 	scan_keypad();        // scan
 	handle_waveform_state(); // update waveform
+
+	ADC0->PSSI |= (1 << 0);   // start conversion on sequencer 0
+	while ((ADC0->RIS & (1 << 0)) == 0) { }  // wait for SS0 complete
+
+	uint16_t ain7 = ADC0->SSFIFO0 & 0xFFF;
+	uint16_t ain6 = ADC0->SSFIFO0 & 0xFFF;
+	uint16_t ain8 = ADC0->SSFIFO0 & 0xFFF;
+
+	ADC0->ISC = (1 << 0);  // clear SS0 interrupt
+
+	updateADSR(ain7, ain6, ain8);
+	envelope_updateParams();
 }
 
 

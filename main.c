@@ -15,6 +15,7 @@
 #include "dma.h"
 
 #include "adc.h"
+#include "display_utils.h"
 
 #include <math.h>
 void config_I2S_circuit()
@@ -79,87 +80,6 @@ void test_keypad_with_I2S()
 
 }
 
-void drawWaveformSample(void)
-{
-    clearScreen();
-
-    int centerY = ILI9341_TFTHEIGHT / 2;
-    int startX  = 20;
-    int width   = 200;
-    float scaleY = 50.0f;
-		uint16_t color = COLOR_SINE;
-    const char *label = "";
-
-    for (int i = 0; i < TABLE_SIZE; i++) {
-        float normalized = 0.0f;
-        float x = startX + (float)i / TABLE_SIZE * width;
-
-        switch (waveform_mode) {
-            case WAVE_SINE:
-								normalized = (sine_table[i] / 65535.0f) * 2.0f - 1.0f; // -1 to +1							
-								color = COLOR_SINE;
-								label = "SINE";
-
-                break;
-
-            case WAVE_SAW:
-                normalized = ((float)i / TABLE_SIZE) * 2.0f - 1.0f;
-								color = COLOR_SAW;
-								label = "SAW";
-    
-								break;
-
-            case WAVE_TRI:
-                if (i < TABLE_SIZE / 2)
-                    normalized = (4.0f * i / TABLE_SIZE) - 1.0f;
-                else
-                    normalized = 3.0f - (4.0f * i / TABLE_SIZE);
-								color = COLOR_TRI;
-								label = "TRI";
-								break;
-
-            case WAVE_SQUARE:
-                normalized = (i < TABLE_SIZE / 2) ? 1.0f : -1.0f;
-								color = COLOR_SQUARE;
-								label = "SQUARE";
-								break;
-
-            default:
-                normalized = 0;
-                break;
-        }
-
-        int y = centerY - (int)(normalized * scaleY);
-				drawPixel((int)x, y, color);
-    }
-		setCharConfig(0xFFFF, 2, 1, 0x0000, 2); // white text, black background
-    moveCursor(70, ILI9341_TFTHEIGHT - 30);          // near bottom center
-    drawString((char*)label, strlen(label));
-
-}
-void displayADCValues(uint16_t ain7, uint16_t ain6, uint16_t ain8)
-{
-    char buf[32];
-
-    // draw background rectangle on right side (to overwrite old text)
-    fillRect(180, 40, 60, 80, 0x0000); // x,y,w,h,black
-
-    setCharConfig(0xFFFF, 1, 1, 0x0000, 1); // white text
-    moveCursor(185, 50);
-
-    snprintf(buf, sizeof(buf), "A7:%4u", ain7);
-    drawString(buf, strlen(buf));
-
-    moveCursor(185, 70);
-    snprintf(buf, sizeof(buf), "A6:%4u", ain6);
-    drawString(buf, strlen(buf));
-
-    moveCursor(185, 90);
-    snprintf(buf, sizeof(buf), "A8:%4u", ain8);
-    drawString(buf, strlen(buf));
-}
-
-
 // ************* main function ***********************
 int main(void)
 {	
@@ -199,43 +119,13 @@ int main(void)
 	int prev = 0;
 	while(true) 
 	{
-		
-		ADC0->PSSI |= (1 << 0);   // start conversion on sequencer 0
-		while ((ADC0->RIS & (1 << 0)) == 0) { }  // wait for SS0 complete
-		
-		uint16_t ain7 = ADC0->SSFIFO0 & 0xFFF;
-		uint16_t ain6 = ADC0->SSFIFO0 & 0xFFF;
-		uint16_t ain8 = ADC0->SSFIFO0 & 0xFFF;
-	
-		ADC0->ISC = (1 << 0);  // clear SS0 interrupt
-		updateADSR(ain7, ain6, ain8);
+		displayADCValues();        
 
-		// ES_Uprintf(0, "AIN7=%u AIN6=%u AIN8=%u\n", ain7, ain6, ain8);
-		displayADCValues(ain7, ain6, ain8);        
-		
 		if (waveform_changed)
 		{
-			if (prev == 0)
-			{
-				drawWaveformSample();
-				prev = 1;
-				
-			}
-			else
-			{
-				drawWaveformSample();
-				prev = 0;
-			}
+			drawWaveformSample();
 			waveform_changed = 0;
 		}
-		if (scan_ready)
-		{
-			scan_ready = 0;
-			// scan_keypad(); // look for keypad presses
-			// handle_waveform_state(); // update waveform according to waveform select
-		}
-		
 	}	
-	
 	return 0;
 }

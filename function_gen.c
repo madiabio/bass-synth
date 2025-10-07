@@ -10,6 +10,7 @@
 #include "SSI.h" // for 
 #include "LCD_Display.h"
 #include "input.h"
+#include "adc.h"
 
 // for waveform state
 volatile waveform_t waveform_mode = WAVE_SINE; 
@@ -35,6 +36,31 @@ static int16_t prev_y = ILI9341_TFTHEIGHT / 2; // start mid-screen
 volatile size_t scope_write_index = 0;
 uint16_t display_buffer[SCOPE_BUFFER_SIZE];
 volatile int scope_ready = 0;
+
+// for envelope
+#define ENV_SCALE     16       // envelope resolution bits (0–65535)
+#define SR_DIV_1024   47       // ~48000 / 1024 ˜ 46.9, close enough
+#define ENV_RELEASE_STEP 800   // release decrement per sample
+
+typedef enum {
+    ENV_IDLE,
+    ENV_ATTACK,
+    ENV_DECAY,
+    ENV_SUSTAIN,
+    ENV_RELEASE
+} env_state_t;
+
+typedef struct {
+    env_state_t state;
+    uint32_t value;         // 0–65535
+    uint32_t attack_inc;
+    uint32_t decay_dec;
+    uint32_t sustain_level;
+} envelope_t;
+
+static envelope_t env;
+
+
 
 // for waveform select LED MSB
 void init_PG1()
@@ -132,12 +158,74 @@ void handle_waveform_state(void) {
 
 void handle_note_input(uint8_t note_index, bool reset_phase) {
     if (note_index < CHROMATIC_LEN) {
-        phase_step = chromatic[note_index].step; // frequency control word
+        phase_step = chromatic[note_index].step;
         if (reset_phase) {
-            phase_acc = 0; // restart waveform at zero phase
+            phase_acc = 0;
         }
     }
 }
+
+
+void envelope_updateParams(void)
+{
+    // approximate sample count: (ms * 48) using integer math (~48000/1000)
+    uint32_t a_samples = (uint32_t)Attack_ms * 48U;
+    uint32_t d_samples = (uint32_t)Decay_ms * 48U;
+
+    if (a_samples == 0) a_samples = 1;
+    if (d_samples == 0) d_samples = 1;
+
+    env.attack_inc = 65535U / a_samples;
+    env.decay_dec  = (65535U - (Sustain_lv * 65U)) / d_samples;
+    env.sustain_level = Sustain_lv * 65U;
+}
+
+static inline uint16_t envelope_next(void)
+{
+    if (note_on && env.state == ENV_IDLE)
+        env.state = ENV_ATTACK;
+    else if (!note_on && env.state != ENV_IDLE && env.state != ENV_RELEASE)
+        env.state = ENV_RELEASE;
+
+    switch (env.state) {
+        case ENV_IDLE:
+            break;
+
+        case ENV_ATTACK:
+            env.value += env.attack_inc;
+            if (env.value >= 65535U) {
+                env.value = 65535U;
+                env.state = ENV_DECAY;
+            }
+            break;
+
+        case ENV_DECAY:
+            if (env.value > env.sustain_level) {
+                env.value -= env.decay_dec;
+                if (env.value <= env.sustain_level) {
+                    env.value = env.sustain_level;
+                    env.state = ENV_SUSTAIN;
+                }
+            }
+            break;
+
+        case ENV_SUSTAIN:
+            env.value = env.sustain_level;
+            break;
+
+        case ENV_RELEASE:
+            if (env.value > ENV_RELEASE_STEP)
+                env.value -= ENV_RELEASE_STEP;
+            else {
+                env.value = 0;
+                env.state = ENV_IDLE;
+            }
+            break;
+    }
+    return (uint16_t)env.value;
+}
+
+
 
 uint16_t next_sample(void) {
     uint16_t sample;
@@ -153,11 +241,10 @@ uint16_t next_sample(void) {
 					case WAVE_SQUARE: sample = sqr_table[idx];  break;
 			}
 			// === scale and recenter before sending to DAC ===
-			int32_t s = (int32_t)sample - 32768;
-			s = (s * 26214) >> 15;      // *0.8
+
+			uint16_t env_amp = envelope_next();
+			int32_t s = ((int32_t)(sample - 32768) * env_amp) >> 16;
 			sample = (uint16_t)(s + 32768);
-			
-			sample = note_on ? sample : DAC_MID;
 			prev_sample = sample; // update global copy	
 		}
 		else // RIGHT CHANNEL
@@ -172,27 +259,6 @@ uint16_t next_sample(void) {
 		return sample;
 }
 
-static uint16_t scope_index = 0;
-
-void drawWaveform(void)
-{
-    int16_t mid   = ILI9341_TFTHEIGHT / 2;
-    float scale   = (ILI9341_TFTHEIGHT / 65536.0f);
-    float x_step  = (float)ILI9341_TFTWIDTH / SCOPE_BUFFER_SIZE;
-
-    uint16_t color = 0xFFFF; // white
-    uint16_t bg    = 0x0000; // black
-
-    clearScreen();  // or fillScreen(bg);
-
-    for (int i = 0; i < ILI9341_TFTWIDTH; i++) {
-        int idx = (i * SCOPE_BUFFER_SIZE) / ILI9341_TFTWIDTH;
-        int16_t y = mid - (int16_t)((display_buffer[idx] - DAC_MID) * scale);
-
-        // 2-pixel vertical trace for visibility
-        fillRect(i, y-1, 1, 2, color);
-    }
-}
 
 void fillBuffer(uint16_t *buffer, size_t frameCount)
 {
@@ -205,6 +271,7 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
 		current_channel ^= 1; 	// switch channel
 		buffer[i] = sample; 	// push sample into buffer
 		
+		/*
 		if (current_channel == 0) // if left channel, push sample to display buffer, update scope idx.
 		{
 			display_buffer[scope_write_index++] = sample; 
@@ -215,6 +282,7 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
 			if (scope_write_index == 0)
 					scope_ready = 1;
 			}
+		*/
 	}
 }
 
