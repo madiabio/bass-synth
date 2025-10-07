@@ -144,6 +144,7 @@ void drawWaveformSample(void)
     int width   = 200;
     float scaleY = 50.0f;
 		uint16_t color = COLOR_SINE;
+    const char *label = "";
 
     for (int i = 0; i < TABLE_SIZE; i++) {
         float normalized = 0.0f;
@@ -153,12 +154,16 @@ void drawWaveformSample(void)
             case WAVE_SINE:
 								normalized = (sine_table[i] / 65535.0f) * 2.0f - 1.0f; // -1 to +1							
 								color = COLOR_SINE;
+								label = "SINE";
+
                 break;
 
             case WAVE_SAW:
                 normalized = ((float)i / TABLE_SIZE) * 2.0f - 1.0f;
 								color = COLOR_SAW;
-                break;
+								label = "SAW";
+    
+								break;
 
             case WAVE_TRI:
                 if (i < TABLE_SIZE / 2)
@@ -166,11 +171,13 @@ void drawWaveformSample(void)
                 else
                     normalized = 3.0f - (4.0f * i / TABLE_SIZE);
 								color = COLOR_TRI;
-                break;
+								label = "TRI";
+								break;
 
             case WAVE_SQUARE:
                 normalized = (i < TABLE_SIZE / 2) ? 1.0f : -1.0f;
-								color = COLOR_SQUARE;    
+								color = COLOR_SQUARE;
+								label = "SQUARE";
 								break;
 
             default:
@@ -181,6 +188,10 @@ void drawWaveformSample(void)
         int y = centerY - (int)(normalized * scaleY);
 				drawPixel((int)x, y, color);
     }
+		setCharConfig(0xFFFF, 2, 1, 0x0000, 2); // white text, black background
+    moveCursor(70, ILI9341_TFTHEIGHT - 30);          // near bottom center
+    drawString((char*)label, strlen(label));
+
 }
 
 // ************* main function ***********************
