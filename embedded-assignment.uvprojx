@@ -405,16 +405,6 @@
               <FilePath>.\function_gen.c</FilePath>
             </File>
             <File>
-              <FileName>notes.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\notes.h</FilePath>
-            </File>
-            <File>
-              <FileName>notes.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\notes.c</FilePath>
-            </File>
-            <File>
               <FileName>waveforms.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\waveforms.h</FilePath>

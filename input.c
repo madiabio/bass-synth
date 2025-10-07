@@ -1,5 +1,4 @@
 // Handles inputs
-#include "notes.h"
 #include "function_gen.h"
 #include "input.h"
 #include "ES.h"

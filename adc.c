@@ -10,6 +10,9 @@
 #define SS3 (1<<3)
 #include <stdint.h>
 #define IRQ_NUMBER_ADC0_SEQ0 14
+
+
+
 void init_adc(void) {
     SYSCTL->RCGCGPIO |= (1<<3) | (1<<4);   // Port D,E clocks
     while ((SYSCTL->PRGPIO & ((1<<3)|(1<<4))) == 0);
@@ -35,21 +38,18 @@ void init_adc(void) {
     ADC0->ACTSS |= (1<<0);         // enable SS0
 }
 
+volatile uint16_t Attack_ms  = 50;
+volatile uint16_t Decay_ms   = 100;
+volatile uint16_t Sustain_lv = 700;  // scaled ×1000
 
-// Define storage for your potentiometer values
-volatile uint32_t Attack_Value;
-volatile uint32_t Decay_Value;
-volatile uint32_t Sustain_Value;
-
-void ADC0Seq0_Handler(void) 
+static inline uint16_t mapU16(uint16_t val, uint16_t out_min, uint16_t out_max)
 {
-    // 1. Read all three samples from FIFO0 (AIN7 -> AIN6 -> AIN8)
-    Attack_Value = ADC0->SSFIFO0;  
-    Decay_Value  = ADC0->SSFIFO0;
-    Sustain_Value = ADC0->SSFIFO0;
-    
-    // 3. Clear the interrupt status bit for Sequencer 0 [1, 2, 16]
-    ADC0->ISC = (1 << 0); 
+    return ((uint32_t)val * (out_max - out_min) / ADC_MAX) + out_min;
 }
 
-
+void updateADSR(uint16_t ain7, uint16_t ain6, uint16_t ain8)
+{
+    Attack_ms  = mapU16(ain7, 5, 500);
+    Decay_ms   = mapU16(ain6, 10, 1000);
+    Sustain_lv = mapU16(ain8, 0, 1000);  // 0–1000 = 0.0–1.0
+}

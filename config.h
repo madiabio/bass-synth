@@ -6,7 +6,6 @@
 #define SAMPLE_FREQ  48000u      // audio sample rate = 48kHz (Hz)
 #define REFRESH_RATE 20 // 20Hz refresh raet for the screen
 
-
 // Derived timer reload value
 #define KEYPAD_SCAN_PERIOD 250
 #define TIMER0A_RELOAD  ((SYS_CLK_FREQ / KEYPAD_SCAN_PERIOD ) - 1)
@@ -32,7 +31,7 @@
 #define SCOPE_BUFFER_SIZE  320 // ring scope buffer for display (mono)
 
 // Wave table settings
-#define TABLE_SIZE 4096 	// number of samples
+#define TABLE_SIZE 256 	// number of samples
 #define DAC_MAX    0xFFFF // highest value the DAC can hold
 #define DAC_MID 0x8000  // middle value of the DAC
 
@@ -41,5 +40,9 @@
 #define COLOR_SAW       0xF800  // red
 #define COLOR_TRI  0x001F  // blue
 #define COLOR_SQUARE    0xFFE0  // yellow
+
+// ADC 
+#define ADC_MAX 4096
+
 
 #endif

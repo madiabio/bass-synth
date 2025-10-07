@@ -1,7 +1,6 @@
 --cpu=Cortex-M4.fp.sp
 ".\objects\main.o"
 ".\objects\function_gen.o"
-".\objects\notes.o"
 ".\objects\waveforms.o"
 ".\objects\input.o"
 ".\objects\adc.o"

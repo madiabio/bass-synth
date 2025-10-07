@@ -5,8 +5,7 @@
 #include <stdbool.h>
 #include "ES_Lib.h"
 #include "function_gen.h"
-#include "waveforms.h" // for sine wave
-#include "notes.h" // for notes dict
+#include "waveforms.h" // for waves and notes
 #include "i2c.h" // for mcp4275_write()
 #include "SSI.h" // for 
 #include "LCD_Display.h"
@@ -138,17 +137,6 @@ void handle_note_input(uint8_t note_index, bool reset_phase) {
             phase_acc = 0; // restart waveform at zero phase
         }
     }
-}
-
-static inline float poly_blep(float t, float dt) {
-    if (t < dt) {
-        t /= dt;
-        return t + t - t * t - 1.0f;
-    } else if (t > 1.0f - dt) {
-        t = (t - 1.0f) / dt;
-        return t * t + t + t + 1.0f;
-    }
-    return 0.0f;
 }
 
 uint16_t next_sample(void) {
