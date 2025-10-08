@@ -24,18 +24,6 @@ volatile uint8_t waveform_changed = 0;
 
 volatile int current_channel = 0; // 0 = Left, 1 = Right
 
-// for drawing
-#define MIDLINE  (ILI9341_TFTHEIGHT / 2)   // 160 for a 320-pixel-tall display
-#define SCALE  (ILI9341_TFTHEIGHT / 65536.0f)
-static int16_t x_pos = 0;
-static int16_t prev_x = 0;
-static int16_t prev_y = ILI9341_TFTHEIGHT / 2; // start mid-screen
-
-// for drawing buffer
-volatile size_t scope_write_index = 0;
-uint16_t display_buffer[SCOPE_BUFFER_SIZE];
-volatile int scope_ready = 0;
-
 // for envelope
 #define ENV_SCALE     16       // envelope resolution bits (0–65535)
 #define SR_DIV_1024   47       // ~48000 / 1024 ˜ 46.9, close enough
@@ -179,7 +167,7 @@ void envelope_updateParams(void)
     env.sustain_level = Sustain_lv * 65U;
 }
 
-static inline uint16_t envelope_next(void)
+static uint16_t envelope_next(void)
 {
     if (note_on && env.state == ENV_IDLE)
         env.state = ENV_ATTACK;
@@ -228,34 +216,21 @@ static inline uint16_t envelope_next(void)
 
 uint16_t next_sample(void) {
     uint16_t sample;
-		uint16_t idx = PHASE_TO_INDEX(phase_acc, TABLE_SIZE);
+    uint16_t idx = PHASE_TO_INDEX(phase_acc, TABLE_SIZE);
 
-		if (current_channel == 0) // LEFT CHANNEL
-		{
-			
-			switch (waveform_mode) {
-					case WAVE_SINE:   sample = sine_table[idx]; break;
-					case WAVE_SAW:    sample = saw_table[idx];  break;
-					case WAVE_TRI:    sample = tri_table[idx];  break;
-					case WAVE_SQUARE: sample = sqr_table[idx];  break;
-			}
-			// === scale and recenter before sending to DAC ===
+    switch (waveform_mode) {
+        case WAVE_SINE:   sample = sine_table[idx]; break;
+        case WAVE_SAW:    sample = saw_table[idx];  break;
+        case WAVE_TRI:    sample = tri_table[idx];  break;
+        case WAVE_SQUARE: sample = sqr_table[idx];  break;
+    }
 
-			uint16_t env_amp = envelope_next();
-			int32_t s = ((int32_t)(sample - 32768) * env_amp) >> 16;
-			sample = (uint16_t)(s + 32768);
-			prev_sample = sample; // update global copy	
-		}
-		else // RIGHT CHANNEL
-		{
-			// advance the master phase accumulator (once per stereo frame)
-			if (note_on) phase_acc += phase_step; // only advance when note is active
-			sample = prev_sample; 	 // for now just want to have mono.
-		}
+    uint16_t env_amp = envelope_next();
+    int32_t s = ((int32_t)(sample - 32768) * env_amp) >> 16;
+    sample = (uint16_t)(s + 32768);
 
-
-		
-		return sample;
+    if (note_on) phase_acc += phase_step;   // always advance once per sample
+    return sample;
 }
 
 
@@ -268,20 +243,7 @@ void fillBuffer(uint16_t *buffer, size_t frameCount)
 		sample = next_sample(); // next_sample updates current_channel
     
 		current_channel ^= 1; 	// switch channel
-		buffer[i] = sample; 	// push sample into buffer
-		
-		/*
-		if (current_channel == 0) // if left channel, push sample to display buffer, update scope idx.
-		{
-			display_buffer[scope_write_index++] = sample; 
-			if (scope_write_index >= SCOPE_BUFFER_SIZE)
-			{
-				scope_write_index = 0;
-			}
-			if (scope_write_index == 0)
-					scope_ready = 1;
-			}
-		*/
+		buffer[i] = sample; 	// push sample into buffer		
 	}
 }
 

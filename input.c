@@ -64,7 +64,7 @@ void init_timer0a() {
 
 
 
-// Timer0A Handler scans the keypad at periodic intervals
+// Timer0A Handler scans the keypad at periodic intervals, triggers the waveform state update, and also triggers the ADC to refresh
 void TIMER0A_Handler(void) 
 {
 	TIMER0->ICR = 0x1;    // clear interrupt flag
@@ -116,7 +116,6 @@ void scan_keypad(void) {
         {'7','8','9'},
         {'*','0','#'}
     };
-
     for (int col = 0; col < 3; col++) {
         GPIOK->DATA &= ~0x07;          // all low
         GPIOK->DATA |= (1 << col);     // one high
@@ -158,50 +157,3 @@ void scan_keypad(void) {
     note_on = 0;
     key_pressed = -1;
 }
-
-/*
-void scan_keypad()
-{
-	char last_raw = 0;
-	char stable_key =  0;
-	uint8_t count = 0;
-	
-	const char keyMap[4][3] = {
-  {'1', '2', '3'},
-  {'4', '5', '6'},
-  {'7', '8', '9'},
-  {'*', '0', '#'}
-	};
-
-	while(true)
-	{
-		int mask = 0;
-		for (int col = 0; col < 3; col++) {
-			// set all cols low and then set current col high.
-			GPIOK->DATA &= ~((1 << 0) | (1 << 1) | (1 << 2));
-			GPIOK->DATA |= (1 << col);
-			ES_usDelay(100);
-			uint32_t rows = GPIOE_AHB->DATA & 0x0F; // PE0 PE3
-
-			// iterate thru each input and check which bit has been set
-			// then reference that to the key map to see which key that
-			// corresponds to.
-			for (int row = 0; row < 4; row++) {
-				if ((rows >> row) & 0x1) {
-					key_pressed  = keyMap[row][col];
-					note_on = 1;
-					ES_Uprintf(0, "Key Pressed: %c; count: %i\n", key_pressed, e_irq_count);
-					while ((GPIOE_AHB->DATA & (1<<row)) != 0) {
-							ES_usDelay(1000); // small hold delay
-					}
-					note_on = 0; // clear when released
-					key_pressed = -1;
-					ES_Uprintf(0, "Released\n");
-
-				}	
-			}
-		}
-		ES_msDelay(30);
-	}
-}
-*/

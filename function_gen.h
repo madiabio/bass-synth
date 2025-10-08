@@ -7,12 +7,11 @@
 
 #define FUNCTION_GEN_H
 #define WAVE_BUF_LEN 240
+
+
 #define PG1 (1<<1)
 #define PK4 (1<<4)
-
 #define PD7 (1<<7)
-
-
 
 // Handles waveform mode
 typedef enum {
@@ -49,7 +48,7 @@ extern volatile uint8_t waveform_changed;
 // phase_acci s a 32 bit int, therefore, extract the top 8 bits by shifting right. 32 - 8 = 24.
 #define PHASE_TO_INDEX(acc, tbl_size) ((uint32_t)((acc * (uint64_t)tbl_size) >> 32))
 
-
+// For the waveform state change thing
 void init_PG1();  // waveform select LED0
 void init_PK4(); // waveform select LED1
 void init_button_PD7(); // waveform select button
