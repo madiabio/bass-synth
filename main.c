@@ -64,8 +64,8 @@ int main(void)
 	init_timer0a();
 	static uint8_t skip = 0;
 	
-	ES_Uprintf(0, "CR0=0x%08lx  CPSR=%lu\n", SSI3->CR0, SSI3->CPSR);
 	ES_Uprintf(0, "sysclk: %d\n", ES_getSystemClk());
+	
 	int prev = 0;
 	while(true) 
 	{
