@@ -21,8 +21,8 @@ The codebase is organised into small modules responsible for waveform generation
 - Three analog potentiometers wired to ADC channels AIN6, AIN7, and AIN8.
 - Momentary push button with two indicator LEDs to select waveforms.
 - ILI9341-based SPI TFT display (used via `LCD_Display` driver library).
-- D Latch as T Flip Flop connected to the SSI line of the 
-- Optional: Audio amplifier, oscilloscope, delay pedal for evaluation.
+- D Latch as T Flip Flop connected to the SSI line of the uC and the FSS line of the DAC (converts SPI to I2S protocol)
+- Optional: Audio amplifier, oscilloscope, headphones for evaluation.
 
 > **Note:** Audio amplification is outside the firmware scope; feed the DAC output into an external amp or powered speakers.
 
@@ -37,7 +37,7 @@ The codebase is organised into small modules responsible for waveform generation
 ### Control Loop & Inputs
 - **Timer0A ISR** (`TIMER0A_Handler` in `input.c`) runs every 4 ms to scan the keypad, cycle waveforms on button press (`handle_waveform_state`), trigger ADC sampling, and feed the new ADS values into the envelope.
 - **Keypad Mapping** – Key presses map to chromatic semitone steps, updating the phase increment and optionally resetting the phase for clean attacks.
-- **Envelope Engine** – Attack, decay, and sustain values (0–1000 ms/level) come from the potentiometer ADC readings. The envelope state machine supports attack → decay → sustain → release transitions with configurable slopes.
+- **Envelope Engine** – Attack, decay, and sustain values (0–1000 ms/level) come from the potentiometer ADC readings. 
 - **Display Updates** – `display_utils.c` redraws the selected waveform and renders ADS values on the TFT. The main loop continually refreshes the display when `waveform_changed` is set by the button handler.
 
 ### Support Peripherals
@@ -73,7 +73,6 @@ The codebase is organised into small modules responsible for waveform generation
 ### Configuration Tweaks
 - Adjust `SAMPLE_FREQ`, `BASE_FREQ`, or SSI prescalers in `config.h` to experiment with different sample rates (12 kHz, 24 kHz, or 48 kHz presets are documented).
 - Change `FRAME_COUNT` to trade audio latency for buffer refresh frequency.
-- Update color constants in `config.h` to match different display themes.
 
 ## Usage
 1. Power the LaunchPad and peripherals.
@@ -81,16 +80,14 @@ The codebase is organised into small modules responsible for waveform generation
 3. Use the keypad to trigger notes. Keys map from `1` (C2) to `#` (B3).
 4. Turn the attack, decay, and sustain potentiometers to sculpt the envelope. Values update every 4 ms.
 5. Press the waveform button to cycle Sine → Saw → Triangle → Square; LEDs and the TFT label indicate the active mode.
-6. Monitor the UART console for debug output if needed (`115200 8N1`).
 
 ## Testing & Validation
-- **Aural Evaluation:** Waveforms were validated by ear in each mode. Clean tones emerge once the envelope reaches steady state; high sustain can introduce deliberate distortion due to quantisation and headroom limits.
+- **Aural Evaluation:** Waveforms were validated by ear in each mode. Clean tones emerge once the envelope reaches steady state; high sustain can introduce distortion due to quantisation and headroom limits.
 - **Oscilloscope Capture:** DAC output (yellow) vs. digital data (green) confirms each waveform and the I2S timing (BCLK ≈ 1.54 MHz, WSEL ≈ 44–48 kHz).
-- **DMA Verification:** Debugger inspection ensured the DMA handler refreshed ping/pong buffers without underruns.
 - **Display Check:** Visual inspection confirmed waveform previews and ADS values, though minor rendering glitches remain.
 
 ## Known Issues & Future Work
-- Sustain set to zero can lock the envelope, requiring a reset—add guard logic in the envelope state machine to avoid this edge case.
+- Sustain set to zero can lock the envelope, requiring a reset.
 - Occasional display artefacts should be investigated in the SPI driver or drawing routines.
 - Output headroom is limited; reducing waveform table amplitude or migrating to a higher-resolution DAC could lower distortion and hum.
 - Planned enhancements include MIDI-over-USB input, polyphony, sequencer/arpeggiator features, preset storage (EEPROM), dedicated octave buttons, standalone ADC interrupt triggering, improved shielding, and live waveform visualisation.
