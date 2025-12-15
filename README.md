@@ -45,21 +45,6 @@ The codebase is organised into small modules responsible for waveform generation
 - **UART0** provides serial logging at 115200 baud for diagnostics.
 - **GPIO LEDs** on PG1/PK4 mirror the currently selected waveform.
 
-## Repository Layout
-```
-├── main.c               // System bring-up & main loop
-├── function_gen.c/.h    // Waveform state machine & envelope
-├── waveforms.c/.h       // Lookup tables for waves & chromatic notes
-├── dma.c/.h             // uDMA ping-pong configuration
-├── SSI.c/.h             // SSI/I2S & SPI display drivers
-├── adc.c/.h             // Potentiometer sampling & ADS mapping
-├── input.c/.h           // Keypad scanning, timer ISR, UART
-├── display_utils.c/.h   // TFT rendering helpers
-├── LCD_Display.*        // Display driver (ILI9341)
-├── ES*.h                // Embedded Systems helper utilities
-└── config.h             // Centralised build-time configuration
-```
-
 ## Building the Firmware
 1. **Toolchain:** The project targets the Keil µVision environment (see `.uvprojx` and `.uvoptx` files) with TI’s TM4C device packs. Alternatively, you can port the build to GCC/Make by replicating the startup code and linker script used by the TM4C129.
 2. **Dependencies:**
@@ -71,7 +56,7 @@ The codebase is organised into small modules responsible for waveform generation
    - Build the project and flash it to the LaunchPad via the ICDI debugger.
 
 ### Configuration Tweaks
-- Adjust `SAMPLE_FREQ`, `BASE_FREQ`, or SSI prescalers in `config.h` to experiment with different sample rates (12 kHz, 24 kHz, or 48 kHz presets are documented).
+- Adjust `SAMPLE_FREQ`, `BASE_FREQ`, or SSI prescalers in `config.h` to experiment with different sample rates.
 - Change `FRAME_COUNT` to trade audio latency for buffer refresh frequency.
 
 ## Usage
