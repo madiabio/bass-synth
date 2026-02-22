@@ -1,4 +1,5 @@
 # Monophonic Digital Bass Synthesizer
+I have a YouTube video demonstrating this project here: https://www.youtube.com/watch?v=EuSdQnB61mw
 
 ## Overview
 This project implements a monophonic digital bass synthesizer on the TI TM4C129 series microcontroller. It combines real-time waveform generation, an ADS (attack/decay/sustain) envelope, and an SPI-driven TFT display to create an embedded bass instrument tailored for an Embedded Systems (student-defined) project by me. The firmware drives an external UDA1334A I2S DAC for audio output, samples three analog potentiometers for envelope control, and accepts note input from a 4x3 matrix keypad.
